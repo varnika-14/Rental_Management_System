@@ -1,0 +1,30 @@
+.dashboard h1 {
+  font-size: 1.8rem;
+  margin-bottom: 2rem;
+}
+
+.cards {
+  display: flex;
+  gap: 2rem;
+  flex-wrap: wrap;
+}
+
+.card {
+  flex: 1;
+  min-width: 220px;
+  height: 140px;
+  background: linear-gradient(135deg, #3b82f6, #1e3a8a);
+  color: white;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 14px;
+  text-decoration: none;
+  font-size: 1.1rem;
+  font-weight: 600;
+  transition: 0.3s;
+}
+
+.card:hover {
+  transform: translateY(-5px);
+}
