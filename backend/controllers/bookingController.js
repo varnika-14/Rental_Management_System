@@ -152,31 +152,43 @@ exports.acceptBooking = async (req, res) => {
 };
 
 // CANCEL BOOKING (For Tenant)
+// backend/controllers/bookingController.js
+
 exports.cancelBooking = async (req, res) => {
   try {
-    const { id } = req.params;
+    const { id } = req.params; // Using standardized 'id'
     const userId = (req.user._id || req.user.id).toString();
 
     const booking = await Booking.findById(id);
     if (!booking) return res.status(404).json({ message: "Booking not found" });
 
-    // Check if requester is the tenant OR the owner
+    // Authorization
     const isTenant = booking.tenant.toString() === userId;
     const isOwner = booking.owner.toString() === userId;
-
     if (!isTenant && !isOwner) {
       return res.status(403).json({ message: "Not authorized to cancel" });
+    }
+
+    // IF THE BOOKING WAS ALREADY ACCEPTED:
+    // We must "Free Up" the property
+    if (booking.status === "accepted") {
+      await Property.findByIdAndUpdate(booking.property, {
+        isBooked: false,
+        bookingEndDate: null,
+      });
     }
 
     booking.status = "cancelled";
     await booking.save();
 
-    res.json({ message: "Booking cancelled", booking });
+    res.json({
+      message: "Booking cancelled and property is now available",
+      booking,
+    });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
 };
-
 // REJECT BOOKING
 exports.rejectBooking = async (req, res) => {
   try {

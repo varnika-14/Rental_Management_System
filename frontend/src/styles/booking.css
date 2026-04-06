@@ -2,13 +2,15 @@
    BOOKING STATUS BADGES
    ========================================== */
 .status-tag {
-  padding: 6px 14px;
-  border-radius: 20px;
-  font-size: 0.75rem;
-  font-weight: 700;
+  position: absolute;
+  top: 15px; /* Distance from top */
+  right: 15px; /* Distance from right */
+  padding: 5px 12px;
+  font-size: 0.7rem;
+  border-radius: 6px;
+  z-index: 5;
   text-transform: uppercase;
-  letter-spacing: 0.03em;
-  display: inline-block;
+  font-weight: 700;
 }
 
 .status-pending {
@@ -19,7 +21,7 @@
 
 .status-accepted {
   background: #dcfce7;
-  color: #16a34a;
+  color: #166534; /* Darker green for readability */
   border: 1px solid #bbf7d0;
 }
 
@@ -36,7 +38,7 @@
 }
 
 /* ==========================================
-   LAYOUT & GRID
+   BOOKING CARD & GRID
    ========================================== */
 .booking-grid {
   display: grid;
@@ -45,83 +47,45 @@
   margin-top: 24px;
 }
 
-/* ==========================================
-   BOOKING CARD STYLING
-   ========================================== */
 .booking-card {
+  position: relative;
+  padding: 24px;
+  padding-top: 35px; /* Space for the floating badge */
   background: #ffffff;
   border: 1px solid #e5e7eb;
   border-radius: 16px;
-  padding: 24px;
-  box-shadow:
-    0 4px 6px -1px rgba(0, 0, 0, 0.05),
-    0 2px 4px -1px rgba(0, 0, 0, 0.03);
-  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   display: flex;
   flex-direction: column;
+  transition: all 0.3s ease;
 }
 
 .booking-card:hover {
   transform: translateY(-5px);
-  box-shadow:
-    0 20px 25px -5px rgba(0, 0, 0, 0.1),
-    0 10px 10px -5px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
   border-color: #3b82f6;
 }
-
 .booking-card-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: flex-start;
-  margin-bottom: 16px;
+  margin-bottom: 12px;
+  padding-right: 80px; /* Prevents title from running into the badge */
 }
 
 .property-title {
   font-size: 1.15rem;
   font-weight: 700;
   color: #111827;
-  margin: 0 0 4px 0;
-}
-
-.property-loc {
-  font-size: 0.875rem;
-  color: #6b7280;
   margin: 0;
 }
-
 /* ==========================================
-   CARD BODY & DETAILS
+   NEW: FEEDBACK BOXES
    ========================================== */
-.booking-card-body {
-  display: flex;
-  flex-direction: column;
-  gap: 12px;
-  padding: 16px 0;
-  border-top: 1px solid #f3f4f6;
-  border-bottom: 1px solid #f3f4f6;
-  margin: 12px 0;
-}
-
-.detail-row {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  font-size: 0.925rem;
-}
-
-.detail-row b {
-  color: #374151;
-  font-weight: 600;
-}
-
-.detail-row span:last-child {
-  color: #4b5563;
-}
-
-.total-price {
-  font-weight: 700;
-  color: #2563eb;
-  font-size: 1rem;
+.success-box {
+  background-color: #f0fdf4;
+  border-left: 4px solid #22c55e;
+  padding: 12px;
+  margin-top: 10px;
+  color: #166534;
+  font-size: 0.85rem;
+  border-radius: 4px;
 }
 
 .rejection-box {
@@ -135,7 +99,7 @@
 }
 
 /* ==========================================
-   BUTTONS & ACTIONS
+   BUTTONS
    ========================================== */
 .booking-actions {
   display: flex;
@@ -145,200 +109,49 @@
 
 .btn-accept {
   background: #2563eb;
-  color: #ffffff;
+  color: white;
   border: none;
   padding: 10px 16px;
   border-radius: 8px;
   font-weight: 600;
   cursor: pointer;
   flex: 1;
-  transition: background 0.2s;
-}
-
-.btn-accept:hover {
-  background: #1d4ed8;
-}
-
-.btn-reject {
-  background: #ffffff;
-  color: #374151;
-  border: 1px solid #d1d5db;
-  padding: 10px 16px;
-  border-radius: 8px;
-  font-weight: 600;
-  cursor: pointer;
-  flex: 1;
-  transition: all 0.2s;
-}
-
-.btn-reject:hover {
-  background: #f9fafb;
-  border-color: #9ca3af;
+  transition: 0.2s;
 }
 
 .btn-cancel {
-  background: #ef4444;
-  color: #ffffff;
-  border: none;
+  background: #f3f4f6;
+  color: #374151;
+  border: 1px solid #d1d5db;
   width: 100%;
   padding: 12px;
   border-radius: 8px;
   font-weight: 600;
   cursor: pointer;
   margin-top: 12px;
+}
+
+/* Red Cancel button for accepted bookings */
+.btn-cancel-danger {
+  background: #ef4444;
+  color: white;
+  border: none;
+  width: 100%;
+  padding: 12px;
+  border-radius: 8px;
+  font-weight: 700;
+  cursor: pointer;
+  margin-top: 12px;
   transition: background 0.2s;
 }
 
-.btn-cancel:hover {
+.btn-cancel-danger:hover {
   background: #dc2626;
 }
 
 /* ==========================================
-   EMPTY STATES & UTILS
+   AVAILABILITY ALERT (Property Details)
    ========================================== */
-.empty-state {
-  text-align: center;
-  padding: 60px 20px;
-  color: #9ca3af;
-  background: #f9fafb;
-  border-radius: 12px;
-  border: 2px dashed #e5e7eb;
-  grid-column: 1 / -1;
-}
-
-.booking-details-card {
-  background: white;
-  border-radius: 12px;
-  padding: 2rem;
-  border: 1px solid #e5e7eb;
-  max-width: 800px;
-  margin: 20px auto;
-}
-
-/* ==========================================
-   RESPONSIVE DESIGN
-   ========================================== */
-@media (max-width: 640px) {
-  .booking-grid {
-    grid-template-columns: 1fr;
-  }
-
-  .booking-card {
-    padding: 20px;
-  }
-
-  .booking-actions {
-    flex-direction: column;
-  }
-}
-
-button:disabled {
-  background-color: #e5e7eb !important;
-  color: #9ca3af !important;
-  cursor: not-allowed !important;
-  border: 1px solid #d1d5db !important;
-}
-/* Booking Form Card */
-.booking-form-card {
-  background: #ffffff;
-  border: 1px solid #e5e7eb;
-  border-radius: 12px;
-  padding: 24px;
-  margin-top: 20px;
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
-}
-
-.booking-form-card h3 {
-  margin: 0 0 8px 0;
-  font-size: 1.25rem;
-  color: #111827;
-}
-
-.form-subtitle {
-  font-size: 0.9rem;
-  color: #6b7280;
-  margin-bottom: 20px;
-}
-
-/* Form Groups */
-.form-group {
-  margin-bottom: 20px;
-  display: flex;
-  flex-direction: column;
-  gap: 8px;
-}
-
-.form-group label {
-  font-size: 0.85rem;
-  font-weight: 600;
-  color: #374151;
-}
-
-/* Input Styling */
-.form-input {
-  padding: 10px 12px;
-  border: 1px solid #d1d5db;
-  border-radius: 8px;
-  font-size: 0.95rem;
-  transition:
-    border-color 0.2s,
-    box-shadow 0.2s;
-}
-
-.form-input:focus {
-  outline: none;
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
-}
-
-/* Duration Container (Flexbox) */
-.duration-input-container {
-  display: flex;
-  gap: 10px;
-}
-
-.duration-num {
-  flex: 1; /* Input takes up available space */
-}
-
-.duration-select {
-  width: 120px; /* Select box stays a consistent size */
-  background-color: #f9fafb;
-}
-
-/* Submit Button */
-.booking-btn-primary {
-  width: 100%;
-  padding: 12px;
-  background-color: #2563eb;
-  color: white;
-  border: none;
-  border-radius: 8px;
-  font-size: 1rem;
-  font-weight: 600;
-  cursor: pointer;
-  transition: background-color 0.2s;
-  margin-top: 10px;
-}
-
-.booking-btn-primary:hover {
-  background-color: #1d4ed8;
-}
-
-.booking-btn-primary:disabled {
-  background-color: #9ca3af;
-  cursor: not-allowed;
-}
-
-/* Responsive adjustments */
-@media (max-width: 480px) {
-  .duration-input-container {
-    flex-direction: column;
-  }
-  .duration-select {
-    width: 100%;
-  }
-}
 .booking-status-alert {
   background-color: #fffbeb;
   border: 1px solid #fcd34d;
@@ -355,12 +168,62 @@ button:disabled {
   opacity: 0.8;
 }
 
-.btn-request-primary {
-  background-color: #3b82f6;
+.booking-form-card {
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 12px;
+  padding: 24px;
+  margin-top: 20px;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.05);
+}
+
+.form-group {
+  margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.form-input {
+  padding: 10px 12px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  font-size: 0.95rem;
+}
+
+.duration-input-container {
+  display: flex;
+  gap: 10px;
+}
+
+.booking-btn-primary {
+  width: 100%;
+  padding: 12px;
+  background-color: #2563eb;
   color: white;
-  padding: 12px 24px;
   border: none;
-  border-radius: 6px;
-  cursor: pointer;
+  border-radius: 8px;
   font-weight: 600;
+  cursor: pointer;
+}
+
+.booking-btn-primary:disabled {
+  background-color: #9ca3af;
+  cursor: not-allowed;
+}
+
+/* ==========================================
+   RESPONSIVE
+   ========================================== */
+@media (max-width: 640px) {
+  .booking-grid {
+    grid-template-columns: 1fr;
+  }
+  .duration-input-container {
+    flex-direction: column;
+  }
+  .booking-card-header {
+    padding-right: 0;
+    padding-top: 20px;
+  }
 }

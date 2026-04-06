@@ -13,13 +13,12 @@ function BookingForm({ propertyId, bookedUntil, onBookingSuccess = () => {} }) {
 
   const [loading, setLoading] = useState(false);
 
-  // Calculate the earliest possible start date
-  // If property is booked, use bookedUntil. Otherwise, use today.
+  // Helper to determine the first available date for the calendar
   const getMinDate = () => {
     const today = new Date().toISOString().split("T")[0];
     if (bookedUntil) {
       const availableDate = new Date(bookedUntil).toISOString().split("T")[0];
-      // If the available date is in the past, return today
+      // If the property becomes free in the past, default to today
       return availableDate > today ? availableDate : today;
     }
     return today;
@@ -48,7 +47,6 @@ function BookingForm({ propertyId, bookedUntil, onBookingSuccess = () => {} }) {
       onBookingSuccess();
       navigate("/my-bookings");
     } catch (err) {
-      // The backend will also catch if the user tries to bypass the min date
       alert(err.response?.data?.message || "Error sending request");
     } finally {
       setLoading(false);
@@ -74,7 +72,6 @@ function BookingForm({ propertyId, bookedUntil, onBookingSuccess = () => {} }) {
             value={formData.startDate}
             onChange={handleChange}
             required
-            // Dynamic min date prevents selecting dates before the property is free
             min={getMinDate()}
           />
         </div>

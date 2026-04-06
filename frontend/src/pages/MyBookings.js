@@ -21,11 +21,18 @@ function MyBookings() {
     }
   };
 
-  const handleCancel = async (id) => {
-    if (window.confirm("Are you sure you want to cancel this request?")) {
+  const handleCancel = async (id, status) => {
+    const message =
+      status === "accepted"
+        ? "This booking is already accepted. Cancelling will release the property for others. Are you sure?"
+        : "Are you sure you want to cancel this request?";
+
+    if (window.confirm(message)) {
       try {
         await API.patch(`/booking/${id}/cancel`);
-        alert("Booking cancelled successfully");
+        alert(
+          "Booking cancelled successfully. The property is now available for others.",
+        );
         fetchMyBookings();
       } catch (err) {
         alert(err.response?.data?.message || "Cancellation failed");
@@ -53,7 +60,9 @@ function MyBookings() {
             <div key={b._id} className="booking-card">
               <div className="booking-card-header">
                 <div>
-                  <h3 className="property-title">{b.property?.title}</h3>
+                  <h3 className="property-title">
+                    {b.property?.title || "Property Details Unavailable"}
+                  </h3>
                   <p className="property-loc">📍 {b.property?.location}</p>
                 </div>
                 <span className={`status-tag status-${b.status}`}>
@@ -102,14 +111,26 @@ function MyBookings() {
                     <b>Reason:</b> {b.rejectionReason}
                   </div>
                 )}
+
+                {b.status === "accepted" && (
+                  <div className="success-box">
+                    🎉 Your request was accepted! You can now coordinate move-in
+                    details with the owner.
+                  </div>
+                )}
               </div>
 
-              {b.status === "pending" && (
+              {/* Updated Logic: Show cancel button for both Pending and Accepted requests */}
+              {(b.status === "pending" || b.status === "accepted") && (
                 <button
-                  className="btn-cancel"
-                  onClick={() => handleCancel(b._id)}
+                  className={
+                    b.status === "accepted" ? "btn-cancel-danger" : "btn-cancel"
+                  }
+                  onClick={() => handleCancel(b._id, b.status)}
                 >
-                  Cancel Request
+                  {b.status === "accepted"
+                    ? "Cancel Accepted Booking"
+                    : "Cancel Request"}
                 </button>
               )}
             </div>
