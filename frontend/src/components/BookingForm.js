@@ -1,8 +1,10 @@
 import React, { useState } from "react";
+import { useNavigate } from "react-router-dom"; // Added for redirect
 import API from "../services/api";
 import "../styles/booking.css";
 
 function BookingForm({ propertyId, onBookingSuccess = () => {} }) {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     startDate: "",
     duration: "",
@@ -18,38 +20,40 @@ function BookingForm({ propertyId, onBookingSuccess = () => {} }) {
     });
   };
 
-  // Inside handleSubmit in BookingForm.js
   const handleSubmit = async (e) => {
     e.preventDefault();
     setLoading(true);
 
     try {
-      // FIX: Change 'durationValue' to 'duration' to match controller
       await API.post("/booking/request", {
         propertyId,
         startDate: formData.startDate,
         durationType: formData.durationType,
-        duration: formData.duration, // Matches backend req.body.duration
+        duration: formData.duration,
       });
 
-      alert("Booking request sent!");
+      alert("Booking request sent successfully!");
       onBookingSuccess();
+      navigate("/my-bookings"); // Redirects to your bookings page
     } catch (err) {
       alert(err.response?.data?.message || "Error sending request");
     } finally {
       setLoading(false);
     }
   };
+
   return (
     <div className="booking-form-card">
-      <h3>Request Booking</h3>
+      <h3>Request This Property</h3>
+      <p className="form-subtitle">Enter your preferred stay details below.</p>
 
       <form onSubmit={handleSubmit} className="booking-form">
         <div className="form-group">
-          <label>Start Date</label>
+          <label>Preferred Start Date</label>
           <input
             type="date"
             name="startDate"
+            className="form-input"
             value={formData.startDate}
             onChange={handleChange}
             required
@@ -58,20 +62,21 @@ function BookingForm({ propertyId, onBookingSuccess = () => {} }) {
         </div>
 
         <div className="form-group">
-          <label>Duration</label>
-          <div className="duration-group">
+          <label>Stay Duration</label>
+          <div className="duration-input-container">
             <input
               type="number"
               name="duration"
-              placeholder="Enter duration"
+              className="form-input duration-num"
+              placeholder="Qty"
               value={formData.duration}
               onChange={handleChange}
               required
               min="1"
             />
-
             <select
               name="durationType"
+              className="form-input duration-select"
               value={formData.durationType}
               onChange={handleChange}
             >
@@ -86,7 +91,7 @@ function BookingForm({ propertyId, onBookingSuccess = () => {} }) {
           disabled={loading}
           className="booking-btn-primary"
         >
-          {loading ? "Sending..." : "Request Booking"}
+          {loading ? "Processing..." : "Confirm Booking Request"}
         </button>
       </form>
     </div>

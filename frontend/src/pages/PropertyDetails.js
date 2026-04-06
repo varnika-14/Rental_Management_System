@@ -14,28 +14,38 @@ function PropertyDetails() {
   const [selectedImage, setSelectedImage] = useState(null);
   const [userRole, setUserRole] = useState(null);
   const [showBookingForm, setShowBookingForm] = useState(false);
+  const [isRequestPending, setIsRequestPending] = useState(false);
 
   useEffect(() => {
-    const fetchProperty = async () => {
+    const fetchPropertyAndStatus = async () => {
       try {
+        // 1. Fetch Property Details
         const res = await API.get(`/property/${id}`);
         setProperty(res.data);
+
+        // 2. Get User Info
+        const user = JSON.parse(localStorage.getItem("user"));
+        if (user) {
+          setUserRole(user.role);
+
+          // 3. If Tenant, check if they already have a pending request for THIS property
+          if (user.role === "tenant") {
+            const bookingsRes = await API.get("/booking/my-bookings");
+            const pending = bookingsRes.data.some(
+              (b) => b.property?._id === id && b.status === "pending",
+            );
+            setIsRequestPending(pending);
+          }
+        }
       } catch (err) {
+        console.error("Error loading property details:", err);
         alert("Unable to load property details");
       } finally {
         setLoading(false);
       }
     };
 
-    const getUserRole = () => {
-      const user = JSON.parse(localStorage.getItem("user"));
-      if (user) {
-        setUserRole(user.role);
-      }
-    };
-
-    fetchProperty();
-    getUserRole();
+    fetchPropertyAndStatus();
   }, [id]);
 
   if (loading) {
@@ -106,10 +116,26 @@ function PropertyDetails() {
           )}
         </div>
 
-        {/* Booking Section */}
+        {/* Updated Booking Section */}
         {userRole === "tenant" && !property.isBooked && (
-          <div>
-            {!showBookingForm ? (
+          <div style={{ marginTop: "20px", marginBottom: "20px" }}>
+            {isRequestPending ? (
+              <button
+                disabled
+                style={{
+                  backgroundColor: "#9ca3af",
+                  height: "50px",
+                  width: "200px",
+                  borderRadius: "5px",
+                  color: "white",
+                  border: "none",
+                  cursor: "not-allowed",
+                  fontWeight: "bold",
+                }}
+              >
+                Request Pending
+              </button>
+            ) : !showBookingForm ? (
               <button
                 style={{
                   backgroundColor: "#3b82f6",
@@ -119,6 +145,7 @@ function PropertyDetails() {
                   color: "white",
                   border: "none",
                   cursor: "pointer",
+                  fontWeight: "bold",
                 }}
                 onClick={() => setShowBookingForm(true)}
               >
@@ -127,7 +154,10 @@ function PropertyDetails() {
             ) : (
               <BookingForm
                 propertyId={property._id}
-                onBookingSuccess={() => setShowBookingForm(false)}
+                onBookingSuccess={() => {
+                  setShowBookingForm(false);
+                  setIsRequestPending(true); // Update UI immediately
+                }}
               />
             )}
           </div>
@@ -169,7 +199,6 @@ function PropertyDetails() {
             >
               ✕
             </button>
-
             <img src={selectedImage} alt="Preview" />
           </div>
         </div>

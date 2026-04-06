@@ -6,23 +6,41 @@ const Property = require("../models/Property");
 exports.createBookingRequest = async (req, res) => {
   try {
     const { propertyId, startDate, duration, durationType } = req.body;
-
-    // 1. Check if user is logged in (from auth middleware)
-    if (!req.user || (!req.user._id && !req.user.id)) {
-      return res.status(401).json({ message: "User not authenticated" });
-    }
-
-    // 2. Normalize the ID (handle both id and _id)
     const tenantId = req.user._id || req.user.id;
 
+    // 1. Check if property exists
     const property = await Property.findById(propertyId);
     if (!property)
       return res.status(404).json({ message: "Property not found" });
 
-    // 3. Create the booking with the tenantId
+    // 2. PREVENT DOUBLE BOOKING: Check if property is already occupied
+    if (property.isBooked) {
+      return res
+        .status(400)
+        .json({
+          message: "This property is already booked by another tenant.",
+        });
+    }
+
+    // 3. PREVENT DUPLICATE REQUESTS: Check if THIS tenant already has a pending request for THIS property
+    const existingRequest = await Booking.findOne({
+      property: propertyId,
+      tenant: tenantId,
+      status: "pending",
+    });
+
+    if (existingRequest) {
+      return res
+        .status(400)
+        .json({
+          message: "You already have a pending request for this property.",
+        });
+    }
+
+    // 4. Create the booking
     const booking = new Booking({
       property: propertyId,
-      tenant: tenantId, // Using the normalized ID
+      tenant: tenantId,
       owner: property.owner,
       startDate: new Date(startDate),
       duration: parseInt(duration),
@@ -35,27 +53,24 @@ exports.createBookingRequest = async (req, res) => {
     });
 
     await booking.save();
-    await booking.populate(["property", "tenant", "owner"]);
-
     res
       .status(201)
       .json({ message: "Booking request sent successfully", booking });
   } catch (err) {
-    console.log("BOOKING ERROR:", err);
     res.status(500).json({ message: err.message });
   }
 };
 // OWNER REQUESTS
 // exports.getOwnerBookingRequests
+// GET OWNER REQUESTS (For the Owner's Dashboard)
 exports.getOwnerBookingRequests = async (req, res) => {
   try {
-    // Ensure we match the ID from the auth middleware
     const ownerId = req.user._id || req.user.id;
 
     const bookings = await Booking.find({ owner: ownerId })
-      .populate("property") // Get property details
-      .populate("tenant", "name email") // Get only name and email of tenant
-      .sort({ createdAt: -1 }); // Newest first
+      .populate("property") // Gets all property details (title, location, images, rent)
+      .populate("tenant", "name email phoneNumber") // Gets specific tenant details
+      .sort({ createdAt: -1 });
 
     res.json(bookings);
   } catch (error) {
@@ -63,14 +78,14 @@ exports.getOwnerBookingRequests = async (req, res) => {
   }
 };
 
-// exports.getTenantBookings
+// GET TENANT BOOKINGS (For the Tenant's Dashboard)
 exports.getTenantBookings = async (req, res) => {
   try {
     const tenantId = req.user._id || req.user.id;
 
     const bookings = await Booking.find({ tenant: tenantId })
-      .populate("property")
-      .populate("owner", "name email")
+      .populate("property") // Gets full property details
+      .populate("owner", "name email phoneNumber") // Gets specific owner details
       .sort({ createdAt: -1 });
 
     res.json(bookings);
