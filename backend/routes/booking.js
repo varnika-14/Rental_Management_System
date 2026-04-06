@@ -19,8 +19,8 @@ router.use(auth);
 router.post("/request", createBookingRequest);
 router.get("/requests", getOwnerBookingRequests);
 router.get("/my-bookings", getTenantBookings);
-router.patch("/:bookingId/accept", acceptBooking);
-router.patch("/:bookingId/reject", rejectBooking);
-router.patch("/:bookingId/cancel", cancelBooking);
+router.patch("/:id/accept", acceptBooking);
+router.patch("/:id/reject", rejectBooking);
+router.patch("/:id/cancel", cancelBooking);
 
 module.exports = router;

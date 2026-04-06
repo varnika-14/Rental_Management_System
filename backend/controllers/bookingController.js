@@ -7,22 +7,28 @@ exports.createBookingRequest = async (req, res) => {
   try {
     const { propertyId, startDate, duration, durationType } = req.body;
     const tenantId = req.user._id || req.user.id;
+    const requestedStartDate = new Date(startDate);
 
     // 1. Check if property exists
     const property = await Property.findById(propertyId);
-    if (!property)
+    if (!property) {
       return res.status(404).json({ message: "Property not found" });
-
-    // 2. PREVENT DOUBLE BOOKING: Check if property is already occupied
-    if (property.isBooked) {
-      return res
-        .status(400)
-        .json({
-          message: "This property is already booked by another tenant.",
-        });
     }
 
-    // 3. PREVENT DUPLICATE REQUESTS: Check if THIS tenant already has a pending request for THIS property
+    // 2. PREVENT OVERLAPPING BOOKINGS
+    // If the property is booked, check if the requested start date is before the current booking ends
+    if (property.isBooked && property.bookingEndDate) {
+      const availableDate = new Date(property.bookingEndDate);
+
+      if (requestedStartDate < availableDate) {
+        return res.status(400).json({
+          message: `This property is occupied until ${availableDate.toLocaleDateString()}. Please select a start date after this period.`,
+        });
+      }
+    }
+
+    // 3. PREVENT DUPLICATE REQUESTS
+    // Check if this tenant already has a pending request for this specific property
     const existingRequest = await Booking.findOne({
       property: propertyId,
       tenant: tenantId,
@@ -30,32 +36,36 @@ exports.createBookingRequest = async (req, res) => {
     });
 
     if (existingRequest) {
-      return res
-        .status(400)
-        .json({
-          message: "You already have a pending request for this property.",
-        });
+      return res.status(400).json({
+        message: "You already have a pending request for this property.",
+      });
     }
 
-    // 4. Create the booking
+    // 4. Calculate Total Rent
+    const rentAmount = property.rent;
+    const totalRent =
+      durationType === "months"
+        ? rentAmount * duration
+        : rentAmount * 12 * duration;
+
+    // 5. Create the booking
     const booking = new Booking({
       property: propertyId,
       tenant: tenantId,
       owner: property.owner,
-      startDate: new Date(startDate),
+      startDate: requestedStartDate,
       duration: parseInt(duration),
       durationType,
-      monthlyRent: property.rent,
-      totalRent:
-        durationType === "months"
-          ? property.rent * duration
-          : property.rent * 12 * duration,
+      monthlyRent: rentAmount,
+      totalRent: totalRent,
     });
 
     await booking.save();
-    res
-      .status(201)
-      .json({ message: "Booking request sent successfully", booking });
+
+    res.status(201).json({
+      message: "Booking request sent successfully!",
+      booking,
+    });
   } catch (err) {
     res.status(500).json({ message: err.message });
   }
@@ -95,35 +105,47 @@ exports.getTenantBookings = async (req, res) => {
 };
 // ACCEPT
 // ACCEPT BOOKING
+// backend/controllers/bookingController.js
+
 exports.acceptBooking = async (req, res) => {
   try {
-    const { bookingId } = req.params;
-    const ownerId = req.user._id || req.user.id; // Support both JWT formats
+    const { id } = req.params;
+    const booking = await Booking.findById(id);
 
-    const booking = await Booking.findById(bookingId);
     if (!booking) return res.status(404).json({ message: "Booking not found" });
 
-    // FIX: Professional ID comparison
-    if (booking.owner.toString() !== ownerId.toString()) {
-      return res
-        .status(403)
-        .json({ message: "Not authorized: Owner ID mismatch" });
+    // 1. Calculate End Date based on duration and type
+    let endDate = new Date(booking.startDate);
+    if (booking.durationType === "months") {
+      endDate.setMonth(endDate.getMonth() + booking.duration);
+    } else {
+      endDate.setFullYear(endDate.getFullYear() + booking.duration);
     }
 
-    if (booking.status !== "pending") {
-      return res.status(400).json({ message: "Booking is no longer pending" });
-    }
-
+    // 2. Update Booking Status
     booking.status = "accepted";
     await booking.save();
 
-    // Update Property status
+    // 3. Update Property Status and End Date
     await Property.findByIdAndUpdate(booking.property, {
       isBooked: true,
-      bookedBy: booking.tenant,
+      bookingEndDate: endDate,
     });
 
-    res.json({ message: "Booking accepted", booking });
+    // 4. AUTOMATIC REJECTION: Reject all other PENDING requests for this same property
+    await Booking.updateMany(
+      {
+        property: booking.property,
+        _id: { $ne: booking._id },
+        status: "pending",
+      },
+      {
+        status: "rejected",
+        rejectionReason: "Property booked by another tenant.",
+      },
+    );
+
+    res.json({ message: "Booking accepted and property updated", endDate });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
@@ -132,10 +154,10 @@ exports.acceptBooking = async (req, res) => {
 // CANCEL BOOKING (For Tenant)
 exports.cancelBooking = async (req, res) => {
   try {
-    const { bookingId } = req.params;
+    const { id } = req.params;
     const userId = (req.user._id || req.user.id).toString();
 
-    const booking = await Booking.findById(bookingId);
+    const booking = await Booking.findById(id);
     if (!booking) return res.status(404).json({ message: "Booking not found" });
 
     // Check if requester is the tenant OR the owner
@@ -158,12 +180,12 @@ exports.cancelBooking = async (req, res) => {
 // REJECT BOOKING
 exports.rejectBooking = async (req, res) => {
   try {
-    const { bookingId } = req.params;
+    const { id } = req.params;
     // Handle cases where rejectionReason might not be sent in the body
     const rejectionReason = req.body?.rejectionReason || "Declined by owner";
     const ownerId = (req.user._id || req.user.id).toString();
 
-    const booking = await Booking.findById(bookingId);
+    const booking = await Booking.findById(id);
     if (!booking) {
       return res.status(404).json({ message: "Booking not found" });
     }

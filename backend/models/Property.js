@@ -14,6 +14,8 @@ const PropertySchema = new mongoose.Schema(
     location: { type: String, required: true },
     address: { type: String },
     images: [{ type: String }],
+    isBooked: { type: Boolean, default: false },
+    bookingEndDate: { type: Date, default: null },
   },
   { timestamps: true },
 );

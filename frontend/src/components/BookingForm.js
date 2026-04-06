@@ -1,9 +1,9 @@
 import React, { useState } from "react";
-import { useNavigate } from "react-router-dom"; // Added for redirect
+import { useNavigate } from "react-router-dom";
 import API from "../services/api";
 import "../styles/booking.css";
 
-function BookingForm({ propertyId, onBookingSuccess = () => {} }) {
+function BookingForm({ propertyId, bookedUntil, onBookingSuccess = () => {} }) {
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     startDate: "",
@@ -12,6 +12,18 @@ function BookingForm({ propertyId, onBookingSuccess = () => {} }) {
   });
 
   const [loading, setLoading] = useState(false);
+
+  // Calculate the earliest possible start date
+  // If property is booked, use bookedUntil. Otherwise, use today.
+  const getMinDate = () => {
+    const today = new Date().toISOString().split("T")[0];
+    if (bookedUntil) {
+      const availableDate = new Date(bookedUntil).toISOString().split("T")[0];
+      // If the available date is in the past, return today
+      return availableDate > today ? availableDate : today;
+    }
+    return today;
+  };
 
   const handleChange = (e) => {
     setFormData({
@@ -34,8 +46,9 @@ function BookingForm({ propertyId, onBookingSuccess = () => {} }) {
 
       alert("Booking request sent successfully!");
       onBookingSuccess();
-      navigate("/my-bookings"); // Redirects to your bookings page
+      navigate("/my-bookings");
     } catch (err) {
+      // The backend will also catch if the user tries to bypass the min date
       alert(err.response?.data?.message || "Error sending request");
     } finally {
       setLoading(false);
@@ -45,7 +58,11 @@ function BookingForm({ propertyId, onBookingSuccess = () => {} }) {
   return (
     <div className="booking-form-card">
       <h3>Request This Property</h3>
-      <p className="form-subtitle">Enter your preferred stay details below.</p>
+      <p className="form-subtitle">
+        {bookedUntil
+          ? `Note: This property is available from ${new Date(bookedUntil).toLocaleDateString()}`
+          : "Enter your preferred stay details below."}
+      </p>
 
       <form onSubmit={handleSubmit} className="booking-form">
         <div className="form-group">
@@ -57,7 +74,8 @@ function BookingForm({ propertyId, onBookingSuccess = () => {} }) {
             value={formData.startDate}
             onChange={handleChange}
             required
-            min={new Date().toISOString().split("T")[0]}
+            // Dynamic min date prevents selecting dates before the property is free
+            min={getMinDate()}
           />
         </div>
 

@@ -339,3 +339,28 @@ button:disabled {
     width: 100%;
   }
 }
+.booking-status-alert {
+  background-color: #fffbeb;
+  border: 1px solid #fcd34d;
+  color: #92400e;
+  padding: 15px;
+  border-radius: 8px;
+  margin: 15px 0;
+  font-size: 0.95rem;
+}
+
+.small-text {
+  font-size: 0.8rem;
+  margin-top: 5px;
+  opacity: 0.8;
+}
+
+.btn-request-primary {
+  background-color: #3b82f6;
+  color: white;
+  padding: 12px 24px;
+  border: none;
+  border-radius: 6px;
+  cursor: pointer;
+  font-weight: 600;
+}

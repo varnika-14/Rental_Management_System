@@ -23,7 +23,7 @@ function PropertyDetails() {
         const res = await API.get(`/property/${id}`);
         setProperty(res.data);
 
-        // 2. Get User Info
+        // 2. Get User Info from localStorage
         const user = JSON.parse(localStorage.getItem("user"));
         if (user) {
           setUserRole(user.role);
@@ -89,14 +89,19 @@ function PropertyDetails() {
           )}
           <p className="property-details-rent">₹ {property.rent} / month</p>
 
+          {/* Availability Message */}
           {property.isBooked && (
-            <div className="booking-status booked">
+            <div className="booking-status-alert">
               <p>
-                <strong>🔒 Property Already Booked</strong>
+                <strong>⚠️ Currently Occupied</strong>
               </p>
               <p>
-                This property is currently booked until{" "}
-                {new Date(property.bookingEndDate).toLocaleDateString()}
+                This property is booked until:{" "}
+                <b>{new Date(property.bookingEndDate).toLocaleDateString()}</b>
+              </p>
+              <p className="small-text">
+                You can still request this property for a start date after this
+                period.
               </p>
             </div>
           )}
@@ -116,17 +121,18 @@ function PropertyDetails() {
           )}
         </div>
 
-        {/* Updated Booking Section */}
-        {userRole === "tenant" && !property.isBooked && (
+        {/* Updated Booking Section Logic */}
+        {userRole === "tenant" && (
           <div style={{ marginTop: "20px", marginBottom: "20px" }}>
             {isRequestPending ? (
               <button
                 disabled
+                className="btn-pending-status"
                 style={{
                   backgroundColor: "#9ca3af",
                   height: "50px",
-                  width: "200px",
-                  borderRadius: "5px",
+                  width: "220px",
+                  borderRadius: "8px",
                   color: "white",
                   border: "none",
                   cursor: "not-allowed",
@@ -138,10 +144,10 @@ function PropertyDetails() {
             ) : !showBookingForm ? (
               <button
                 style={{
-                  backgroundColor: "#3b82f6",
+                  backgroundColor: property.isBooked ? "#6366f1" : "#3b82f6",
                   height: "50px",
-                  width: "200px",
-                  borderRadius: "5px",
+                  width: "220px",
+                  borderRadius: "8px",
                   color: "white",
                   border: "none",
                   cursor: "pointer",
@@ -149,14 +155,15 @@ function PropertyDetails() {
                 }}
                 onClick={() => setShowBookingForm(true)}
               >
-                Request Booking
+                {property.isBooked ? "Book for Future Date" : "Request Booking"}
               </button>
             ) : (
               <BookingForm
                 propertyId={property._id}
+                bookedUntil={property.bookingEndDate}
                 onBookingSuccess={() => {
                   setShowBookingForm(false);
-                  setIsRequestPending(true); // Update UI immediately
+                  setIsRequestPending(true);
                 }}
               />
             )}
