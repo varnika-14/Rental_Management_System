@@ -21,13 +21,17 @@ const BookingSchema = new mongoose.Schema(
       type: Date,
       required: true,
     },
+    endDate: {
+      type: Date,
+      required: true,
+    },
     duration: {
       type: Number,
       required: true,
     },
     durationType: {
       type: String,
-      enum: ["months", "years"],
+      enum: ["days", "months", "years"],
       required: true,
     },
     status: {

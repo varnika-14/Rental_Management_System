@@ -15,6 +15,8 @@ function PropertyDetails() {
   const [userRole, setUserRole] = useState(null);
   const [showBookingForm, setShowBookingForm] = useState(false);
   const [isRequestPending, setIsRequestPending] = useState(false);
+  const [acceptedBookings, setAcceptedBookings] = useState([]);
+  const [showOccupiedDetails, setShowOccupiedDetails] = useState(false);
 
   useEffect(() => {
     const fetchPropertyAndStatus = async () => {
@@ -23,12 +25,16 @@ function PropertyDetails() {
         const res = await API.get(`/property/${id}`);
         setProperty(res.data);
 
-        // 2. Get User Info from localStorage
+        // 2. Fetch Accepted Bookings for this property (The Schedule)
+        const scheduleRes = await API.get(`/booking/property/${id}/accepted`);
+        setAcceptedBookings(scheduleRes.data);
+
+        // 3. Get User Info from localStorage
         const user = JSON.parse(localStorage.getItem("user"));
         if (user) {
           setUserRole(user.role);
 
-          // 3. If Tenant, check if they already have a pending request for THIS property
+          // 4. If Tenant, check if they already have a pending request
           if (user.role === "tenant") {
             const bookingsRes = await API.get("/booking/my-bookings");
             const pending = bookingsRes.data.some(
@@ -39,7 +45,6 @@ function PropertyDetails() {
         }
       } catch (err) {
         console.error("Error loading property details:", err);
-        alert("Unable to load property details");
       } finally {
         setLoading(false);
       }
@@ -89,22 +94,76 @@ function PropertyDetails() {
           )}
           <p className="property-details-rent">₹ {property.rent} / month</p>
 
-          {/* Availability Message */}
-          {property.isBooked && (
-            <div className="booking-status-alert">
-              <p>
-                <strong>⚠️ Currently Occupied</strong>
-              </p>
-              <p>
-                This property is booked until:{" "}
-                <b>{new Date(property.bookingEndDate).toLocaleDateString()}</b>
-              </p>
-              <p className="small-text">
-                You can still request this property for a start date after this
-                period.
-              </p>
+          {/* NEW: Property Occupied Details Box */}
+          <div className="booking-status-alert">
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "space-between",
+                alignItems: "center",
+              }}
+            >
+              <span>
+                <strong>
+                  {acceptedBookings.length > 0
+                    ? "📅 Property Occupied Details"
+                    : "✅ Property Available"}
+                </strong>
+              </span>
+              {acceptedBookings.length > 0 && (
+                <button
+                  onClick={() => setShowOccupiedDetails(!showOccupiedDetails)}
+                  className="btn-details-toggle"
+                  style={{
+                    padding: "4px 10px",
+                    fontSize: "0.75rem",
+                    cursor: "pointer",
+                    backgroundColor: "#92400e",
+                    color: "white",
+                    border: "none",
+                    borderRadius: "4px",
+                  }}
+                >
+                  {showOccupiedDetails ? "Hide" : "View Dates"}
+                </button>
+              )}
             </div>
-          )}
+
+            {showOccupiedDetails && (
+              <div
+                className="occupied-list"
+                style={{
+                  marginTop: "10px",
+                  borderTop: "1px dashed #fcd34d",
+                  paddingTop: "10px",
+                }}
+              >
+                {acceptedBookings.map((b, index) => (
+                  <div
+                    key={index}
+                    className="occupied-item"
+                    style={{ fontSize: "0.85rem", marginBottom: "5px" }}
+                  >
+                    🚫 Reserved:{" "}
+                    <b>{new Date(b.startDate).toLocaleDateString()}</b> to{" "}
+                    <b>{new Date(b.endDate).toLocaleDateString()}</b>
+                  </div>
+                ))}
+                <p
+                  className="small-text"
+                  style={{ marginTop: "8px", fontStyle: "italic" }}
+                >
+                  You can request any date outside these ranges.
+                </p>
+              </div>
+            )}
+
+            {acceptedBookings.length === 0 && (
+              <p className="small-text">
+                No current bookings. You can request any start date!
+              </p>
+            )}
+          </div>
 
           <p className="property-details-type">
             <b>Type:</b> {property.type}
@@ -121,7 +180,7 @@ function PropertyDetails() {
           )}
         </div>
 
-        {/* Updated Booking Section Logic */}
+        {/* Updated Booking Section */}
         {userRole === "tenant" && (
           <div style={{ marginTop: "20px", marginBottom: "20px" }}>
             {isRequestPending ? (
@@ -144,7 +203,8 @@ function PropertyDetails() {
             ) : !showBookingForm ? (
               <button
                 style={{
-                  backgroundColor: property.isBooked ? "#6366f1" : "#3b82f6",
+                  backgroundColor:
+                    acceptedBookings.length > 0 ? "#6366f1" : "#3b82f6",
                   height: "50px",
                   width: "220px",
                   borderRadius: "8px",
@@ -155,15 +215,19 @@ function PropertyDetails() {
                 }}
                 onClick={() => setShowBookingForm(true)}
               >
-                {property.isBooked ? "Book for Future Date" : "Request Booking"}
+                {acceptedBookings.length > 0
+                  ? "Book for Free Date"
+                  : "Request Booking"}
               </button>
             ) : (
               <BookingForm
                 propertyId={property._id}
-                bookedUntil={property.bookingEndDate}
+                acceptedBookings={acceptedBookings} // PASSING THE SCHEDULE HERE
                 onBookingSuccess={() => {
                   setShowBookingForm(false);
                   setIsRequestPending(true);
+                  // Refresh schedule after success
+                  window.location.reload();
                 }}
               />
             )}

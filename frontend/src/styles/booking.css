@@ -227,3 +227,61 @@
     padding-top: 20px;
   }
 }
+.btn-details-toggle {
+  transition: background 0.2s ease;
+}
+
+.btn-details-toggle:hover {
+  background: #78350f !important; /* Darker amber */
+}
+
+.occupied-item {
+  border-left: 3px solid #f59e0b;
+
+  padding-left: 8px;
+
+  background: #fffdf2;
+}
+
+/* Fix DatePicker width to match your form */
+
+/* ==========================================
+   NEAT CALENDAR BOX - REDUCING GAPS
+   ========================================== */
+
+/* Shrink the overall container width */
+.react-datepicker {
+  width: auto !important; /* Let it shrink to content */
+  display: inline-block !important;
+}
+
+/* Reduce horizontal padding in the month container */
+.react-datepicker__month-container {
+  float: none !important;
+  padding: 0 5px !important;
+}
+
+/* Fix the header alignment */
+.react-datepicker__header {
+  padding-top: 10px !important;
+}
+
+/* REDUCE GAP: Shrink the day name headers (Su, Mo, etc) */
+.react-datepicker__day-name {
+  width: 2.2rem !important; /* Reduced from 2.5rem */
+  margin: 0.1rem !important; /* Tighten horizontal spacing */
+  color: #6b7280 !important;
+}
+
+/* REDUCE GAP: Shrink the individual day cells */
+.react-datepicker__day {
+  width: 2.2rem !important; /* Match the day-name width */
+  line-height: 2.2rem !important; /* Controls vertical gap */
+  margin: 0.1rem !important; /* Tighten horizontal spacing */
+  border-radius: 6px !important;
+}
+
+/* Remove extra margins from the day grid */
+.react-datepicker__month {
+  margin: 0.2rem !important;
+}

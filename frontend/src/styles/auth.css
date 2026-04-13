@@ -82,3 +82,34 @@
 .auth-link a:hover {
   text-decoration: underline;
 }
+/* ... keep all your existing code ... */
+
+/* Ensures the Step containers stack items exactly like the form did */
+.form-step {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/* Style for the "Enter OTP sent to..." text */
+.step-instruction {
+  font-size: 0.9rem;
+  color: #64748b;
+  margin-bottom: 0.5rem;
+  line-height: 1.4;
+}
+
+/* Optional: Style for a "Resend" or "Change Email" button */
+.text-button {
+  background: none !important;
+  border: none !important;
+  color: #3b82f6 !important;
+  font-size: 0.85rem !important;
+  padding: 0 !important;
+  margin-top: -0.5rem !important;
+  cursor: pointer;
+  width: auto !important;
+  text-decoration: underline;
+  box-shadow: none !important;
+  transform: none !important;
+}
