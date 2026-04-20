@@ -33,7 +33,6 @@ function Layout({ children }) {
               <>
                 <Link to="/properties">Browse Properties</Link>
                 <Link to="/my-bookings">My Bookings</Link>
-                <Link to="/rent-history">Rent History</Link>
               </>
             )}
           </nav>

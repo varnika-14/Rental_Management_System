@@ -8,7 +8,6 @@ import PropertyList from "./pages/PropertyList";
 import PropertyDetails from "./pages/PropertyDetails";
 import MyBookings from "./pages/MyBookings";
 import BookingRequests from "./pages/BookingRequests";
-import RentHistory from "./pages/RentHistory";
 import PrivateRoute from "./components/PrivateRoute";
 import Layout from "./components/Layout";
 
@@ -94,16 +93,6 @@ function App() {
             <PrivateRoute>
               <Layout>
                 <BookingRequests />
-              </Layout>
-            </PrivateRoute>
-          }
-        />
-        <Route
-          path="/rent-history"
-          element={
-            <PrivateRoute>
-              <Layout>
-                <RentHistory />
               </Layout>
             </PrivateRoute>
           }
