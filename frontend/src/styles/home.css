@@ -1,0 +1,205 @@
+/* GLOBAL SETTINGS FOR HOME */
+.modern-home {
+  height: 100vh;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  font-family: 'Poppins', 'Helvetica Neue', sans-serif; /* Example premium font */
+  overflow: hidden; /* Important for the full-screen effect */
+}
+
+/* 1. MINIMALIST OVERLAY NAV */
+.main-nav {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem 5%;
+  z-index: 100; /* Stays on top */
+  background: transparent;
+}
+
+.nav-brand {
+  font-size: 1.2rem;
+  font-weight: 800;
+  color: #0f172a;
+  letter-spacing: 2px;
+}
+
+.nav-actions {
+  display: flex;
+  gap: 1.5rem;
+  align-items: center;
+}
+
+.btn-text {
+  background: none;
+  border: none;
+  color: #1e293b;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.btn-primary-sm {
+  background-color: #0f172a;
+  color: white;
+  border: none;
+  padding: 10px 20px;
+  border-radius: 6px;
+  font-weight: 600;
+  cursor: pointer;
+  font-size: 0.9rem;
+}
+
+/* 2. MAIN IMMERSIVE SPLIT SCREEN */
+.split-screen {
+  flex: 1;
+  display: flex;
+  height: 100%;
+}
+
+/* Global definitions for both panels */
+.split-panel {
+  flex: 1;
+  height: 100%;
+  display: flex;
+  align-items: center; /* vertical center content */
+  justify-content: center; /* horizontal center content */
+  position: relative;
+  overflow:hidden;/* Smooth hover expansion */
+}
+
+.panel-content {
+  position: relative;
+  z-index: 2; /* Sits above background and overlay */
+  max-width: 80%;
+  text-align: center;
+}
+
+/* Typography for Panels */
+.panel-subtitle {
+  text-transform: uppercase;
+  letter-spacing: 3px;
+  font-size: 0.8rem;
+  font-weight: 700;
+  margin-bottom: 1rem;
+  display: block;
+}
+
+.panel-title {
+  font-size: 3.5rem;
+  font-weight: 800;
+  line-height: 1.1;
+  margin-bottom: 1.5rem;
+}
+
+.panel-description {
+  font-size: 1.1rem;
+  line-height: 1.6;
+  margin-bottom: 2.5rem;
+  opacity: 0.9;
+}
+
+/* CTA BUTTONS */
+.panel-cta {
+  background-color: transparent;
+  border: 2px solid;
+  padding: 15px 35px;
+  font-size: 1rem;
+  font-weight: 700;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+/* =========================================
+   SPECIFIC STYLING FOR EACH PATH
+   ========================================= */
+
+/* A. TENANT PATH (LIGHTER, MODERN BLUE) */
+.tenant-panel {
+  background-color: #eff6ff; /* Fallback light blue */
+  /* ADD YOUR OWN HIGH-RES IMAGE HERE */
+  background-size: cover;
+  background-position: center;
+  color: #0f172a;
+}
+
+/* Add a gradient overlay for text readability */
+.tenant-panel::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(239, 246, 255, 0.95), rgba(239, 246, 255, 0.5));
+  z-index: 1;
+}
+
+.tenant-panel .panel-subtitle { color: #2563eb; }
+.tenant-panel .accent-text { color: #2563eb; }
+.tenant-panel .panel-cta {
+  border-color: #2563eb;
+  color: #2563eb;
+}
+.tenant-panel .panel-cta:hover {
+  background-color: #2563eb;
+  color: white;
+}
+
+/* B. OWNER PATH (DARKER, PREMIUM INDIGO) */
+.owner-panel {
+  background-color: #1e293b; /* Fallback dark slate */
+  background-size: cover;
+  background-position: center;
+  color: #f8fafc;
+}
+
+/* Dark gradient overlay */
+.owner-panel::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(135deg, rgba(30, 41, 59, 0.95), rgba(30, 41, 59, 0.6));
+  z-index: 1;
+}
+
+.owner-panel .panel-subtitle { color: #fcd34d; } /* Amber accent */
+.owner-panel .accent-text { color: #fcd34d; }
+.owner-panel .panel-cta {
+  border-color: #f8fafc;
+  color: #f8fafc;
+}
+.owner-panel .panel-cta:hover {
+  background-color: #f8fafc;
+  color: #1e293b;
+}
+
+/* 3. MINIMALIST FOOTER OVERLAY */
+.minimal-footer {
+  position: fixed;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  text-align: center;
+  padding: 1rem;
+  font-size: 0.75rem;
+  color: #64748b;
+  opacity: 0.8;
+  z-index: 10;
+  background: transparent;
+}
+
+/* RESPONSIVE DESIGN */
+@media (max-width: 900px) {
+  .panel-title { font-size: 2.5rem; }
+}
+
+@media (max-width: 600px) {
+  .split-screen { flex-direction: column; } /* Stacks panels vertically on mobile */
+  .panel-title { font-size: 2rem; }
+  .split-panel { flex: 1; width: 100%; height: 50%; }
+}

@@ -111,6 +111,8 @@
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
   transition: 0.3s;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
 }
 
 .property-card:hover {
@@ -118,6 +120,7 @@
   border-color: #3b82f6; /* blue highlight */
   box-shadow: 0 8px 20px rgba(59, 130, 246, 0.2);
 }
+
 /* CLICKABLE */
 .property-card-clickable {
   border: none;
@@ -125,6 +128,7 @@
   cursor: pointer;
   padding: 0;
   text-align: left;
+  width: 100%;
 }
 
 /* CONTENT */
@@ -208,7 +212,6 @@
   cursor: pointer;
 }
 
-/* IMAGE GALLERY */
 /* IMAGE GALLERY - CLEAN GRID */
 .property-details-gallery {
   margin-top: 1.5rem;
@@ -239,12 +242,12 @@
   background: transparent;
   cursor: pointer;
 }
-/* MODAL */
-/* FULLSCREEN MODAL */
+
+/* MODAL / FULLSCREEN OVERLAY */
 .image-modal-overlay {
   position: fixed;
   inset: 0;
-  background: rgba(0, 0, 0, 0.9); /* darker = premium look */
+  background: rgba(0, 0, 0, 0.9);
   display: flex;
   align-items: center;
   justify-content: center;
@@ -252,26 +255,23 @@
   padding: 20px;
 }
 
-/* CENTER CONTAINER */
 .image-modal-content {
   position: relative;
   width: 100%;
   max-width: 1200px;
-  height: 90vh; /* same height for all images */
+  height: 90vh;
   display: flex;
   align-items: center;
   justify-content: center;
 }
 
-/* IMAGE FIXED SIZE */
 .image-modal-content img {
   width: 100%;
   height: 100%;
-  object-fit: contain; /* keeps aspect ratio but SAME BOX SIZE */
+  object-fit: contain;
   border-radius: 10px;
 }
 
-/* CLOSE BUTTON */
 .image-modal-close {
   position: absolute;
   top: 15px;
@@ -284,6 +284,7 @@
   padding: 6px 10px;
   cursor: pointer;
 }
+
 /* RESPONSIVE */
 @media (max-width: 768px) {
   .property-form {
@@ -305,6 +306,6 @@
   }
 
   .property-details-image {
-    max-height: 250px;
+    height: 250px;
   }
 }

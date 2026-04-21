@@ -113,3 +113,54 @@
   box-shadow: none !important;
   transform: none !important;
 }
+/* Add this to your existing auth.css */
+
+.extended-auth {
+  max-width: 800px !important; /* Wider for the details */
+}
+
+.registration-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1.5rem;
+  text-align: left;
+}
+
+.form-section {
+  display: flex;
+  flex-direction: column;
+  gap: 0.8rem;
+}
+
+.form-section h4 {
+  margin-bottom: 0.5rem;
+  color: #3b82f6;
+  border-bottom: 1px solid #e5e7eb;
+  padding-bottom: 5px;
+}
+
+.file-input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.file-input-group label {
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #64748b;
+}
+
+.submit-btn-full {
+  grid-column: span 2; /* Button takes full width of the grid */
+  margin-top: 1rem;
+}
+
+@media (max-width: 600px) {
+  .registration-grid {
+    grid-template-columns: 1fr;
+  }
+  .submit-btn-full {
+    grid-column: span 1;
+  }
+}

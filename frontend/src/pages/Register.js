@@ -1,68 +1,109 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
+import { useNavigate, Link, useLocation } from "react-router-dom";
 import API from "../services/api";
 import "../styles/auth.css";
-import { useNavigate, Link } from "react-router-dom";
 
 function Register() {
   const navigate = useNavigate();
+  const location = useLocation();
 
-  // Single loading state to handle all button transitions
+  // Step and Loading state
+  const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
-  const [step, setStep] = useState(1); // 1: Info, 2: OTP, 3: Password
+
+  // Initialize role strictly from navigation state
+  const initialRole = location.state?.role || "tenant";
 
   const [form, setForm] = useState({
     name: "",
     email: "",
     password: "",
-    role: "tenant",
+    role: initialRole,
     otp: "",
+    age: "",
+    qualification: "",
+    occupation: "",
+    salary: "",
+    permanentAddress: "",
+    emergencyContact: "",
+    govtIdNumber: "",
+    upiId: "",
+    bankDetails: "",
   });
+
+  const [profilePhoto, setProfilePhoto] = useState(null);
+  const [govtIdPhoto, setGovtIdPhoto] = useState(null);
+
+  // Ensure role is updated if the user navigates directly between roles
+  useEffect(() => {
+    if (location.state?.role) {
+      setForm((prev) => ({ ...prev, role: location.state.role }));
+    }
+  }, [location.state]);
 
   const handleChange = (e) =>
     setForm({ ...form, [e.target.name]: e.target.value });
 
-  // STEP 1: Send OTP
-  const handleSendOTP = async () => {
-    if (!form.email || !form.name) {
-      return alert("Please fill in your name and email");
-    }
-    setLoading(true);
-    try {
-      await API.post("/auth/send-otp", { email: form.email });
-      alert("OTP sent to your email!");
-      setStep(2);
-    } catch (err) {
-      alert(err.response?.data || "Failed to send OTP");
-    } finally {
-      setLoading(false);
-    }
+  const handleFileChange = (e) => {
+    if (e.target.name === "profilePhoto") setProfilePhoto(e.target.files[0]);
+    if (e.target.name === "govtIdPhoto") setGovtIdPhoto(e.target.files[0]);
   };
 
-  // STEP 2: Verify OTP
-  const handleVerifyOTP = async () => {
-    if (!form.otp) return alert("Please enter the OTP");
-    setLoading(true);
-    try {
-      await API.post("/auth/verify-otp", { email: form.email, otp: form.otp });
-      alert("Email Verified!");
-      setStep(3);
-    } catch (err) {
-      alert(err.response?.data || "Invalid OTP");
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  // STEP 3: Final Register
-  const handleFinalSubmit = async (e) => {
+  const handleSendOTP = async (e) => {
     e.preventDefault();
     setLoading(true);
     try {
-      const res = await API.post("/auth/register", form);
-      alert(res.data);
+      await API.post("/auth/send-otp", { email: form.email });
+      alert(`OTP sent! You are registering as a ${form.role}`);
+      setStep(2);
+    } catch (err) {
+      alert(err.response?.data?.message || "Failed to send OTP");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleVerifyOTP = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+    try {
+      await API.post("/auth/verify-otp", { email: form.email, otp: form.otp });
+      alert("Email verified. Please complete your profile.");
+      setStep(3);
+    } catch (err) {
+      alert("Invalid OTP. Please try again.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleFinalSubmit = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+
+    const formData = new FormData();
+
+    // 1. Append all text fields
+    Object.keys(form).forEach((key) => {
+      formData.append(key, form[key]);
+    });
+
+    // 2. Append the actual File objects
+    if (profilePhoto) formData.append("profilePhoto", profilePhoto);
+    if (govtIdPhoto) formData.append("govtIdPhoto", govtIdPhoto);
+
+    try {
+      // IMPORTANT: Do NOT manually set 'Content-Type' header here.
+      // Axios/The browser will set it to multipart/form-data with the correct boundary automatically.
+      const res = await API.post("/auth/register", formData);
+
+      alert("Registration Successful!");
       navigate("/login");
     } catch (err) {
-      alert(err.response?.data || "Registration failed");
+      console.error("Full Error Object:", err);
+      alert(
+        err.response?.data || "Registration failed. Check console for details.",
+      );
     } finally {
       setLoading(false);
     }
@@ -70,87 +111,158 @@ function Register() {
 
   return (
     <div className="auth-page">
-      <div className="auth-container">
-        <h2>
-          {step === 1 && "Create Account"}
-          {step === 2 && "Verify Email"}
-          {step === 3 && "Set Password"}
-        </h2>
+      <div className={`auth-container ${step === 3 ? "extended-auth" : ""}`}>
+        <h2 style={{ textTransform: "capitalize" }}>Register as {form.role}</h2>
 
-        {/* STEP 1: User Details */}
+        {/* STEP 1: SEND OTP */}
         {step === 1 && (
-          <div className="form-step">
-            <input
-              name="name"
-              placeholder="Full Name"
-              value={form.name}
-              onChange={handleChange}
-              required
-            />
+          <form onSubmit={handleSendOTP} className="auth-form">
+            <p>Step 1: Email Verification</p>
             <input
               name="email"
               type="email"
-              placeholder="Email"
+              placeholder="Email Address"
               value={form.email}
               onChange={handleChange}
               required
             />
-            <button onClick={handleSendOTP} disabled={loading}>
-              {loading ? "Sending OTP..." : "Send Verification OTP"}
-            </button>
-          </div>
-        )}
-
-        {/* STEP 2: OTP Verification */}
-        {step === 2 && (
-          <div className="form-step">
-            <p className="step-instruction">
-              Enter the 6-digit code sent to <br />
-              <strong>{form.email}</strong>
-            </p>
-            <input
-              name="otp"
-              placeholder="Enter OTP"
-              value={form.otp}
-              onChange={handleChange}
-              maxLength="6"
-              required
-            />
-            <button onClick={handleVerifyOTP} disabled={loading}>
-              {loading ? "Verifying..." : "Verify OTP"}
-            </button>
-            <button
-              className="text-button"
-              onClick={() => setStep(1)}
-              disabled={loading}
-            >
-              Change Email
-            </button>
-          </div>
-        )}
-
-        {/* STEP 3: Password & Role */}
-        {step === 3 && (
-          <form onSubmit={handleFinalSubmit}>
-            <input
-              name="password"
-              type="password"
-              placeholder="Enter Password"
-              onChange={handleChange}
-              required
-            />
-            <select name="role" value={form.role} onChange={handleChange}>
-              <option value="tenant">Tenant</option>
-              <option value="owner">Owner</option>
-            </select>
-            <button type="submit" disabled={loading}>
-              {loading ? "Creating Account..." : "Complete Registration"}
+            <button type="submit" className="submit-btn" disabled={loading}>
+              {loading ? "Sending..." : "Send OTP"}
             </button>
           </form>
         )}
 
-        <div className="auth-link">
-          Already have account? <Link to="/login">Login</Link>
+        {/* STEP 2: VERIFY OTP */}
+        {step === 2 && (
+          <form onSubmit={handleVerifyOTP} className="auth-form">
+            <p>Step 2: Enter Verification Code</p>
+            <input
+              name="otp"
+              placeholder="6-digit OTP"
+              value={form.otp}
+              onChange={handleChange}
+              required
+            />
+            <button type="submit" className="submit-btn" disabled={loading}>
+              {loading ? "Verifying..." : "Verify OTP"}
+            </button>
+          </form>
+        )}
+
+        {/* STEP 3: FULL DETAILS */}
+        {step === 3 && (
+          <form onSubmit={handleFinalSubmit} className="registration-grid">
+            <div className="form-section">
+              <h4>1. Personal</h4>
+              <label className="file-label">Profile Photo</label>
+              <input
+                type="file"
+                name="profilePhoto"
+                onChange={handleFileChange}
+                required
+              />
+              <input
+                name="name"
+                placeholder="Full Name"
+                onChange={handleChange}
+                required
+              />
+              <input
+                name="age"
+                type="number"
+                placeholder="Age"
+                onChange={handleChange}
+                required
+              />
+
+              <input
+                name="emergencyContact"
+                placeholder="Emergency Contact No"
+                onChange={handleChange}
+                required
+              />
+              <textarea
+                name="permanentAddress"
+                placeholder="Permanent Address"
+                onChange={handleChange}
+                required
+              />
+            </div>
+            <div className="form-section">
+              <h4>2. Professional</h4>
+              <input
+                name="qualification"
+                placeholder="Qualification"
+                onChange={handleChange}
+                required
+              />
+              <input
+                name="occupation"
+                placeholder="Occupation"
+                onChange={handleChange}
+                required
+              />
+              <input
+                name="salary"
+                type="number"
+                placeholder="Monthly Salary"
+                onChange={handleChange}
+                required
+              />
+            </div>
+
+            <div className="form-section">
+              <h4>3. Identity</h4>
+              <input
+                name="govtIdNumber"
+                placeholder="Aadhar / PAN Number"
+                onChange={handleChange}
+                required
+              />
+              <label className="file-label">Upload ID Photo</label>
+              <input
+                type="file"
+                name="govtIdPhoto"
+                onChange={handleFileChange}
+                required
+              />
+            </div>
+
+            <div className="form-section">
+              <h4>4. Payments</h4>
+              <input
+                name="upiId"
+                placeholder="UPI ID (e.g. user@okaxis)"
+                onChange={handleChange}
+                required
+              />
+              <textarea
+                name="bankDetails"
+                placeholder="Bank Name, A/C No, IFSC"
+                onChange={handleChange}
+                required
+              />
+              <input
+                name="password"
+                type="password"
+                placeholder="Create Password"
+                onChange={handleChange}
+                required
+              />
+            </div>
+
+            <button
+              type="submit"
+              className="submit-btn-full"
+              disabled={loading}
+            >
+              {loading ? "Registering..." : "Register Successfully"}
+            </button>
+          </form>
+        )}
+
+        <div className="auth-footer">
+          Already have an account? <Link to="/login">Login</Link>
         </div>
       </div>
     </div>

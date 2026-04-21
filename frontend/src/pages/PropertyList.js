@@ -41,7 +41,7 @@ function PropertyList() {
         setUserRole(user.role);
       }
     };
-    
+
     getUserRole();
     fetchProperties();
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -112,7 +112,7 @@ function PropertyList() {
             >
               <div className="property-card-content">
                 <h3>{p.title}</h3>
-                <p>{p.description}</p>
+                <p className="property-description">{p.description}</p>
                 <p>
                   <b>Type:</b> {p.type}
                 </p>
