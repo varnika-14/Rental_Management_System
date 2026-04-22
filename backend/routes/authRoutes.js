@@ -11,6 +11,7 @@ const {
   verifyOTP,
   getProfile,    // <--- Add this
   updateProfile, // <--- Add this
+  getUserProfileById,
 } = require("../controllers/authController");
 
 router.post("/register", upload.fields([
@@ -25,5 +26,6 @@ router.post("/verify-otp", verifyOTP);
 // Profile Routes
 router.get("/profile", authMiddleware, getProfile);
 router.put("/profile/update", authMiddleware, updateProfile);
+router.get("/profile/:id", authMiddleware, getUserProfileById);
 
 module.exports = router;

@@ -212,6 +212,18 @@
   cursor: not-allowed;
 }
 
+.btn-view-details {
+  margin: 8px 0 4px;
+  padding: 8px 12px;
+  border: none;
+  border-radius: 8px;
+  background: #2563eb;
+  color: #ffffff;
+  font-weight: 600;
+  cursor: pointer;
+  width: fit-content;
+}
+
 /* ==========================================
    RESPONSIVE
    ========================================== */

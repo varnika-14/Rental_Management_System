@@ -17,6 +17,15 @@
   padding: 40px;
 }
 
+.profile-back-button {
+  margin-bottom: 12px;
+  padding: 0.4rem 0.8rem;
+  border-radius: 6px;
+  border: 1px solid #d1d5db;
+  background: white;
+  cursor: pointer;
+}
+
 /* Header */
 .profile-header {
   display: flex;

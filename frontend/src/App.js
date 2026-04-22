@@ -12,6 +12,7 @@ import BookingRequests from "./pages/BookingRequests";
 import PrivateRoute from "./components/PrivateRoute";
 import Layout from "./components/Layout";
 import Profile from "./pages/Profile";
+import UserProfileView from "./pages/UserProfileView";
 function App() {
   return (
     <BrowserRouter>
@@ -105,6 +106,16 @@ function App() {
             <PrivateRoute>
               <Layout>
                 <BookingRequests />
+              </Layout>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/users/:id"
+          element={
+            <PrivateRoute>
+              <Layout>
+                <UserProfileView />
               </Layout>
             </PrivateRoute>
           }

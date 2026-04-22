@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from "react";
 import API from "../services/api";
 import "../styles/booking.css";
+import { useNavigate } from "react-router-dom";
 
 function BookingRequests() {
+  const navigate = useNavigate();
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -66,6 +68,15 @@ function BookingRequests() {
                   </span>
                   <span>{r.tenant?.name}</span>
                 </div>
+                {r.tenant?._id && (
+                  <button
+                    type="button"
+                    className="btn-view-details"
+                    onClick={() => navigate(`/users/${r.tenant._id}`)}
+                  >
+                    Tenant Details
+                  </button>
+                )}
                 <div className="detail-row">
                   <span>
                     📧 <b>Email:</b>

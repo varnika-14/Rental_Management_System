@@ -198,6 +198,15 @@ function PropertyDetails() {
               <p>
                 <b>Owner:</b> {property.owner.name} ({property.owner.email})
               </p>
+              {userRole === "tenant" && property.owner?._id && (
+                <button
+                  type="button"
+                  className="property-action-btn view-btn"
+                  onClick={() => navigate(`/users/${property.owner._id}`)}
+                >
+                  Owner Details
+                </button>
+              )}
             </div>
           )}
 

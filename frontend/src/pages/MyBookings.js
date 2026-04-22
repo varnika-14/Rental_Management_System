@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from "react";
 import API from "../services/api";
 import "../styles/booking.css";
+import { useNavigate } from "react-router-dom";
 
 function MyBookings() {
+  const navigate = useNavigate();
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -77,6 +79,15 @@ function MyBookings() {
                   </span>
                   <span>{b.owner?.name}</span>
                 </div>
+                {b.owner?._id && (
+                  <button
+                    type="button"
+                    className="btn-view-details"
+                    onClick={() => navigate(`/users/${b.owner._id}`)}
+                  >
+                    Owner Details
+                  </button>
+                )}
                 <div className="detail-row">
                   <span>
                     📧 <b>Contact:</b>
