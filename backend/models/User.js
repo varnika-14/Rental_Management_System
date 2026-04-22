@@ -18,6 +18,7 @@ const UserSchema = new mongoose.Schema(
     qualification: { type: String, required: true },
     occupation: { type: String, required: true },
     salary: { type: Number, required: true },
+    phonenumber: { type: String, required: true },
     permanentAddress: { type: String, required: true }, // <--- New Field
     emergencyContact: { type: String, required: true }, // <--- New Field
 

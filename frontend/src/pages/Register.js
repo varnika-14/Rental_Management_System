@@ -174,6 +174,14 @@ function Register() {
                 onChange={handleChange}
                 required
               />
+              <input
+                name="phonenumber"
+                type="text"
+                placeholder="Phone Number"
+                value={form.phonenumber}
+                onChange={handleChange}
+                required
+              />
 
               <input
                 name="emergencyContact"

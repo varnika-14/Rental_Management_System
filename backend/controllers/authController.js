@@ -86,6 +86,7 @@ exports.register = async (req, res) => {
       govtIdNumber,
       upiId,
       bankDetails,
+      phonenumber,
       permanentAddress,
       emergencyContact,
     } = req.body;
@@ -100,6 +101,7 @@ exports.register = async (req, res) => {
       !upiId ||
       !bankDetails ||
       !permanentAddress ||
+      !phonenumber ||
       !emergencyContact
     ) {
       return res.status(400).json("All text fields are required");
@@ -139,6 +141,7 @@ exports.register = async (req, res) => {
       govtIdNumber,
       upiId,
       bankDetails,
+      phonenumber,
       // Photo URLs
       profilePhoto: profilePhotoUrl,
       govtIdPhoto: govtIdPhotoUrl,
@@ -216,6 +219,7 @@ exports.updateProfile = async (req, res) => {
       "emergencyContact",
       "qualification",
       "occupation",
+      "phonenumber",
       "salary",
       "govtIdNumber",
       "upiId",

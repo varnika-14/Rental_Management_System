@@ -46,6 +46,7 @@ function Profile() {
       "govtIdNumber",
       "upiId",
       "bankDetails",
+      "phonenumber",
     ];
 
     try {
@@ -132,6 +133,15 @@ function Profile() {
               value={user?.email || ""}
               disabled
               className="readonly-input"
+            />
+          </div>
+          <div className="info-group">
+            <label>Phone Number</label>
+            <input
+              name="phonenumber"
+              value={formData.phonenumber || ""}
+              onChange={handleChange}
+              placeholder="Enter phone number"
             />
           </div>
 
