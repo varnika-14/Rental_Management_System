@@ -20,6 +20,24 @@ function MyProperties() {
     fetchProperties();
   }, [user?._id]);
 
+  const handleDelete = async (propertyId) => {
+    const shouldDelete = window.confirm(
+      "Are you sure you want to delete this property?",
+    );
+    if (!shouldDelete) return;
+
+    try {
+      await API.delete(`/property/${propertyId}`, {
+        data: { ownerId: user?._id },
+      });
+      setProperties((prev) => prev.filter((p) => p._id !== propertyId));
+      alert("Property deleted successfully");
+    } catch (err) {
+      console.error("Error deleting property:", err);
+      alert("Failed to delete property");
+    }
+  };
+
   return (
     <div className="property-container">
       <h2>My Properties</h2>
@@ -31,12 +49,7 @@ function MyProperties() {
       ) : (
         <div className="property-grid">
           {properties.map((p) => (
-            <button
-              key={p._id}
-              type="button"
-              className="property-card property-card-clickable"
-              onClick={() => navigate(`/properties/${p._id}`)}
-            >
+            <div key={p._id} className="property-card">
               <div className="property-card-content">
                 <h3>{p.title}</h3>
                 <p>
@@ -46,8 +59,32 @@ function MyProperties() {
                   <b>Location:</b> {p.location}
                 </p>
                 <p className="rent">₹ {p.rent} / month</p>
+
+                <div className="property-card-actions">
+                  <button
+                    type="button"
+                    onClick={() => navigate(`/properties/${p._id}`)}
+                    className="property-action-btn view-btn"
+                  >
+                    View Details
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => navigate(`/edit-property/${p._id}`)}
+                    className="property-action-btn edit-btn"
+                  >
+                    Edit
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => handleDelete(p._id)}
+                    className="property-action-btn delete-btn"
+                  >
+                    Delete
+                  </button>
+                </div>
               </div>
-            </button>
+            </div>
           ))}
         </div>
       )}

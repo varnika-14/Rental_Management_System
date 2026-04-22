@@ -70,6 +70,28 @@ function PropertyDetails() {
   }
 
   const images = Array.isArray(property.images) ? property.images : [];
+  const storedUser = JSON.parse(localStorage.getItem("user"));
+  const ownerId =
+    typeof property.owner === "object" ? property.owner?._id : property.owner;
+  const isOwner = storedUser?.role === "owner" && storedUser?._id === ownerId;
+
+  const handleDelete = async () => {
+    const shouldDelete = window.confirm(
+      "Are you sure you want to delete this property?",
+    );
+    if (!shouldDelete) return;
+
+    try {
+      await API.delete(`/property/${id}`, {
+        data: { ownerId: storedUser?._id },
+      });
+      alert("Property deleted successfully");
+      navigate("/my-properties");
+    } catch (err) {
+      console.error("Error deleting property:", err);
+      alert("Failed to delete property");
+    }
+  };
 
   return (
     <div className="property-container">
@@ -176,6 +198,25 @@ function PropertyDetails() {
               <p>
                 <b>Owner:</b> {property.owner.name} ({property.owner.email})
               </p>
+            </div>
+          )}
+
+          {isOwner && (
+            <div className="property-owner-actions">
+              <button
+                type="button"
+                className="property-action-btn edit-btn"
+                onClick={() => navigate(`/edit-property/${property._id}`)}
+              >
+                Edit Property
+              </button>
+              <button
+                type="button"
+                className="property-action-btn delete-btn"
+                onClick={handleDelete}
+              >
+                Delete Property
+              </button>
             </div>
           )}
         </div>

@@ -50,6 +50,16 @@ function App() {
           }
         />
         <Route
+          path="/edit-property/:id"
+          element={
+            <PrivateRoute>
+              <Layout>
+                <AddProperty />
+              </Layout>
+            </PrivateRoute>
+          }
+        />
+        <Route
           path="/my-properties"
           element={
             <PrivateRoute>

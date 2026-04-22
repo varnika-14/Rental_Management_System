@@ -1,10 +1,12 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import API from "../services/api";
 import "../styles/property.css";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 
 function AddProperty() {
   const navigate = useNavigate();
+  const { id } = useParams();
+  const isEditMode = Boolean(id);
 
   const [form, setForm] = useState({
     title: "",
@@ -17,6 +19,29 @@ function AddProperty() {
 
   const [imageFiles, setImageFiles] = useState([]);
   const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const loadProperty = async () => {
+      if (!isEditMode) return;
+      try {
+        const res = await API.get(`/property/${id}`);
+        const p = res.data;
+        setForm({
+          title: p.title || "",
+          description: p.description || "",
+          type: p.type || "Apartment",
+          rent: p.rent || "",
+          location: p.location || "",
+          address: p.address || "",
+        });
+      } catch (err) {
+        console.error("Error loading property for edit:", err);
+        alert("Unable to load property details");
+        navigate("/my-properties");
+      }
+    };
+    loadProperty();
+  }, [id, isEditMode, navigate]);
 
   const handleChange = (e) => {
     setForm({ ...form, [e.target.name]: e.target.value });
@@ -49,9 +74,17 @@ function AddProperty() {
         data.append("images", file);
       });
 
-      await API.post("/property", data);
+      if (isEditMode) {
+        await API.put(`/property/${id}`, data);
+      } else {
+        await API.post("/property", data);
+      }
 
-      alert("Property Added Successfully");
+      alert(
+        isEditMode
+          ? "Property Updated Successfully"
+          : "Property Added Successfully",
+      );
       navigate("/my-properties");
     } catch (err) {
       console.error("FULL ERROR:", err);
@@ -64,6 +97,7 @@ function AddProperty() {
   return (
     <div className="property-container">
       <h2>Add New Property</h2>
+      {isEditMode && <p>Edit your property details below.</p>}
 
       <form onSubmit={handleSubmit} className="property-form">
         <input
@@ -122,7 +156,13 @@ function AddProperty() {
         />
 
         <button type="submit" disabled={loading}>
-          {loading ? "Uploading..." : "Add Property"}
+          {loading
+            ? isEditMode
+              ? "Updating..."
+              : "Uploading..."
+            : isEditMode
+              ? "Update Property"
+              : "Add Property"}
         </button>
       </form>
     </div>

@@ -156,6 +156,41 @@
   margin-top: 0.5rem;
 }
 
+.property-card-actions {
+  display: flex;
+  gap: 0.6rem;
+  margin-top: 0.9rem;
+  flex-wrap: wrap;
+}
+
+.property-owner-actions {
+  display: flex;
+  gap: 0.8rem;
+  margin-top: 1rem;
+  flex-wrap: wrap;
+}
+
+.property-action-btn {
+  border: none;
+  border-radius: 8px;
+  padding: 0.45rem 0.8rem;
+  color: #ffffff;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.property-action-btn.view-btn {
+  background: #2563eb;
+}
+
+.property-action-btn.edit-btn {
+  background: #0d9488;
+}
+
+.property-action-btn.delete-btn {
+  background: #dc2626;
+}
+
 /* EMPTY STATE */
 .empty-state {
   text-align: center;
