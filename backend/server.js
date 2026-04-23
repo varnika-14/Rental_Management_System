@@ -12,14 +12,25 @@ const server = http.createServer(app);
 const path = require("path");
 const io = new Server(server, {
   cors: {
-    origin: "http://localhost:3000",
+    origin: [
+      "http://localhost:3000",
+      "https://rental-management-system-var.vercel.app",
+    ], // ✅ Allows both
     methods: ["GET", "POST"],
   },
 });
 
 app.set("io", io);
 
-app.use(cors());
+app.use(
+  cors({
+    origin: [
+      "http://localhost:3000",
+      "https://rental-management-system-var.vercel.app",
+    ],
+    credentials: true,
+  }),
+);
 app.use(express.json());
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
