@@ -37,6 +37,9 @@ function Dashboard() {
         <Link to="/profile" className="card">
           Edit Profile
         </Link>
+        <Link to="/chats" className="card">
+          Chats
+        </Link>
       </div>
     </div>
   );

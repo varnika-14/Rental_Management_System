@@ -2,11 +2,13 @@ import React, { useEffect, useState } from "react";
 import API from "../services/api";
 import "../styles/booking.css";
 import { useNavigate } from "react-router-dom";
+import { startConversation } from "../services/chatApi";
 
 function MyBookings() {
   const navigate = useNavigate();
   const [bookings, setBookings] = useState([]);
   const [loading, setLoading] = useState(true);
+  const currentUser = JSON.parse(localStorage.getItem("user"));
 
   useEffect(() => {
     fetchMyBookings();
@@ -20,6 +22,23 @@ function MyBookings() {
       console.error("Error fetching bookings:", err);
     } finally {
       setLoading(false);
+    }
+  };
+
+  const handleChatWithOwner = async (booking) => {
+    try {
+      if (!booking?.property?._id || !booking?.owner?._id || !currentUser?._id) {
+        return alert("Missing data to start chat");
+      }
+      const res = await startConversation({
+        propertyId: booking.property._id,
+        ownerId: booking.owner._id,
+        tenantId: currentUser._id,
+      });
+      navigate(`/chats?conversation=${res.data._id}`);
+    } catch (err) {
+      console.error("Error starting chat:", err);
+      alert(err.response?.data?.message || "Unable to start chat");
     }
   };
 
@@ -122,6 +141,14 @@ function MyBookings() {
                     <b>Reason:</b> {b.rejectionReason}
                   </div>
                 )}
+
+                <button
+                  type="button"
+                  className="btn-view-details"
+                  onClick={() => handleChatWithOwner(b)}
+                >
+                  Chat with Owner
+                </button>
 
                 {b.status === "accepted" && (
                   <div className="success-box">

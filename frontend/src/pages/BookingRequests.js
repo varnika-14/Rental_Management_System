@@ -2,11 +2,13 @@ import React, { useState, useEffect } from "react";
 import API from "../services/api";
 import "../styles/booking.css";
 import { useNavigate } from "react-router-dom";
+import { startConversation } from "../services/chatApi";
 
 function BookingRequests() {
   const navigate = useNavigate();
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
+  const currentUser = JSON.parse(localStorage.getItem("user"));
 
   useEffect(() => {
     fetchRequests();
@@ -30,6 +32,28 @@ function BookingRequests() {
       fetchRequests(); // Refresh data without reloading page
     } catch (err) {
       alert(err.response?.data?.message || "Action failed");
+    }
+  };
+
+  const handleChatWithTenant = async (requestItem) => {
+    try {
+      if (
+        !requestItem?.property?._id ||
+        !requestItem?.tenant?._id ||
+        !currentUser?._id
+      ) {
+        return alert("Missing data to start chat");
+      }
+
+      const res = await startConversation({
+        propertyId: requestItem.property._id,
+        ownerId: currentUser._id,
+        tenantId: requestItem.tenant._id,
+      });
+      navigate(`/chats?conversation=${res.data._id}`);
+    } catch (err) {
+      console.error("Error starting chat:", err);
+      alert(err.response?.data?.message || "Unable to start chat");
     }
   };
 
@@ -77,6 +101,13 @@ function BookingRequests() {
                     Tenant Details
                   </button>
                 )}
+                <button
+                  type="button"
+                  className="btn-view-details"
+                  onClick={() => handleChatWithTenant(r)}
+                >
+                  Chat with Tenant
+                </button>
                 <div className="detail-row">
                   <span>
                     📧 <b>Email:</b>

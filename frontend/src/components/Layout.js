@@ -21,6 +21,7 @@ function Layout({ children }) {
           <nav className="nav-links">
             <Link to="/dashboard">Dashboard</Link>
             <Link to="/profile">Profile</Link>
+            <Link to="/chats">Chats</Link>
             {user?.role === "owner" && (
               <>
                 <Link to="/add-property">Add Property</Link>

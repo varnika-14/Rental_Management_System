@@ -13,6 +13,7 @@ import PrivateRoute from "./components/PrivateRoute";
 import Layout from "./components/Layout";
 import Profile from "./pages/Profile";
 import UserProfileView from "./pages/UserProfileView";
+import Chats from "./pages/Chats";
 function App() {
   return (
     <BrowserRouter>
@@ -116,6 +117,16 @@ function App() {
             <PrivateRoute>
               <Layout>
                 <UserProfileView />
+              </Layout>
+            </PrivateRoute>
+          }
+        />
+        <Route
+          path="/chats"
+          element={
+            <PrivateRoute>
+              <Layout>
+                <Chats />
               </Layout>
             </PrivateRoute>
           }

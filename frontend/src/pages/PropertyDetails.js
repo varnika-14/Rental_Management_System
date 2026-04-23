@@ -5,6 +5,7 @@ import "../styles/property.css";
 import "../styles/booking.css";
 import { getImageUrl } from "../utils/image";
 import BookingForm from "../components/BookingForm";
+import { startConversation } from "../services/chatApi";
 
 function PropertyDetails() {
   const { id } = useParams();
@@ -90,6 +91,20 @@ function PropertyDetails() {
     } catch (err) {
       console.error("Error deleting property:", err);
       alert("Failed to delete property");
+    }
+  };
+
+  const handleStartChat = async () => {
+    try {
+      const res = await startConversation({
+        propertyId: property._id,
+        ownerId: ownerId,
+        tenantId: storedUser?._id,
+      });
+      navigate(`/chats?conversation=${res.data._id}`);
+    } catch (err) {
+      console.error("Error starting chat:", err);
+      alert(err.response?.data?.message || "Unable to start chat");
     }
   };
 
@@ -233,6 +248,14 @@ function PropertyDetails() {
         {/* Updated Booking Section */}
         {userRole === "tenant" && (
           <div style={{ marginTop: "20px", marginBottom: "20px" }}>
+            <button
+              type="button"
+              className="property-action-btn view-btn"
+              onClick={handleStartChat}
+              style={{ marginBottom: "12px" }}
+            >
+              Chat with Owner
+            </button>
             {isRequestPending ? (
               <button
                 disabled
