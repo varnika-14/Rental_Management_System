@@ -1,21 +1,16 @@
 const Booking = require("../models/Booking");
 const Property = require("../models/Property");
 
-// ==========================================
-// 1. CREATE BOOKING REQUEST (With Interval Check)
-// ==========================================
 exports.createBookingRequest = async (req, res) => {
   try {
     const { propertyId, startDate, duration, durationType } = req.body;
     const tenantId = req.user._id || req.user.id;
 
-    // 1. Check if property exists
     const property = await Property.findById(propertyId);
     if (!property) {
       return res.status(404).json({ message: "Property not found" });
     }
 
-    // 2. Calculate Requested Date Range
     const start = new Date(startDate);
     const end = new Date(startDate);
     const dur = parseInt(duration);
@@ -28,8 +23,6 @@ exports.createBookingRequest = async (req, res) => {
       end.setFullYear(end.getFullYear() + dur);
     }
 
-    // 3. PREVENT OVERLAPPING BOOKINGS (The Gap Strategy)
-    // Check if ANY accepted booking exists that overlaps with the requested range
     const overlappingBooking = await Booking.findOne({
       property: propertyId,
       status: "accepted",
@@ -51,7 +44,6 @@ exports.createBookingRequest = async (req, res) => {
       });
     }
 
-    // 4. PREVENT DUPLICATE PENDING REQUESTS
     const existingRequest = await Booking.findOne({
       property: propertyId,
       tenant: tenantId,
@@ -64,7 +56,6 @@ exports.createBookingRequest = async (req, res) => {
       });
     }
 
-    // 5. Calculate Total Rent
     const rentAmount = property.rent;
     let totalRent = 0;
     if (durationType === "days") {
@@ -75,13 +66,12 @@ exports.createBookingRequest = async (req, res) => {
       totalRent = rentAmount * 12 * dur;
     }
 
-    // 6. Create the booking
     const booking = new Booking({
       property: propertyId,
       tenant: tenantId,
       owner: property.owner,
       startDate: start,
-      endDate: end, // Stored for the calendar/occupied list
+      endDate: end,
       duration: dur,
       durationType,
       monthlyRent: rentAmount,
@@ -99,9 +89,6 @@ exports.createBookingRequest = async (req, res) => {
   }
 };
 
-// ==========================================
-// 2. ACCEPT BOOKING (With Smart Rejection)
-// ==========================================
 exports.acceptBooking = async (req, res) => {
   try {
     const { id } = req.params;
@@ -109,7 +96,6 @@ exports.acceptBooking = async (req, res) => {
 
     if (!booking) return res.status(404).json({ message: "Booking not found" });
 
-    // 1. Ensure endDate is calculated (if not already during creation)
     const startDate = new Date(booking.startDate);
     let endDate = new Date(booking.startDate);
     const duration = parseInt(booking.duration);
@@ -122,19 +108,15 @@ exports.acceptBooking = async (req, res) => {
       endDate.setFullYear(endDate.getFullYear() + duration);
     }
 
-    // 2. Update Booking Status
     booking.status = "accepted";
     booking.endDate = endDate;
     await booking.save();
 
-    // 3. Update Property Metadata
     await Property.findByIdAndUpdate(booking.property, {
       isBooked: true,
       bookingEndDate: endDate,
     });
 
-    // 4. SMART AUTOMATIC REJECTION
-    // Only reject other requests if they actually OVERLAP with this one
     await Booking.updateMany(
       {
         property: booking.property,
@@ -159,9 +141,6 @@ exports.acceptBooking = async (req, res) => {
   }
 };
 
-// ==========================================
-// 3. GET ACCEPTED DATES (For Frontend Calendar)
-// ==========================================
 exports.getAcceptedBookingsByProperty = async (req, res) => {
   try {
     const { propertyId } = req.params;
@@ -176,9 +155,6 @@ exports.getAcceptedBookingsByProperty = async (req, res) => {
   }
 };
 
-// ==========================================
-// 4. CANCEL BOOKING
-// ==========================================
 exports.cancelBooking = async (req, res) => {
   try {
     const { id } = req.params;
@@ -187,7 +163,6 @@ exports.cancelBooking = async (req, res) => {
     const booking = await Booking.findById(id);
     if (!booking) return res.status(404).json({ message: "Booking not found" });
 
-    // Authorization
     if (
       booking.tenant.toString() !== userId &&
       booking.owner.toString() !== userId
@@ -195,7 +170,6 @@ exports.cancelBooking = async (req, res) => {
       return res.status(403).json({ message: "Not authorized" });
     }
 
-    // If it was accepted, we free up the general property status
     if (booking.status === "accepted") {
       await Property.findByIdAndUpdate(booking.property, {
         isBooked: false,
@@ -212,9 +186,6 @@ exports.cancelBooking = async (req, res) => {
   }
 };
 
-// ==========================================
-// 5. REJECT BOOKING
-// ==========================================
 exports.rejectBooking = async (req, res) => {
   try {
     const { id } = req.params;
@@ -236,9 +207,6 @@ exports.rejectBooking = async (req, res) => {
   }
 };
 
-// ==========================================
-// 6. DASHBOARD QUERIES
-// ==========================================
 exports.getOwnerBookingRequests = async (req, res) => {
   try {
     const ownerId = req.user._id || req.user.id;

@@ -29,7 +29,7 @@ function BookingRequests() {
     try {
       await API.patch(`/booking/${id}/${action}`);
       alert(`Booking ${action}ed successfully`);
-      fetchRequests(); // Refresh data without reloading page
+      fetchRequests();
     } catch (err) {
       alert(err.response?.data?.message || "Action failed");
     }

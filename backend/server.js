@@ -32,7 +32,6 @@ app.get("/", (req, res) => {
   res.send("Rental Management API Running");
 });
 
-// Routes
 app.use("/api/auth", require("./routes/authRoutes"));
 app.use("/api/property", require("./routes/property"));
 app.use("/api/booking", require("./routes/booking"));

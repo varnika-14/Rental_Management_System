@@ -27,7 +27,11 @@ function MyBookings() {
 
   const handleChatWithOwner = async (booking) => {
     try {
-      if (!booking?.property?._id || !booking?.owner?._id || !currentUser?._id) {
+      if (
+        !booking?.property?._id ||
+        !booking?.owner?._id ||
+        !currentUser?._id
+      ) {
         return alert("Missing data to start chat");
       }
       const res = await startConversation({
@@ -158,7 +162,6 @@ function MyBookings() {
                 )}
               </div>
 
-              {/* Updated Logic: Show cancel button for both Pending and Accepted requests */}
               {(b.status === "pending" || b.status === "accepted") && (
                 <button
                   className={

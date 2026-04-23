@@ -13,7 +13,6 @@ function Layout({ children }) {
 
   return (
     <div className="app-layout">
-      {/* Sidebar */}
       <aside className="sidebar">
         <div className="sidebar-top">
           <h2 className="logo">Rental Manager</h2>
@@ -45,7 +44,6 @@ function Layout({ children }) {
         </div>
       </aside>
 
-      {/* Main Content */}
       <main className="main-content">{children}</main>
     </div>
   );

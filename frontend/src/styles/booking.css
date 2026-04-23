@@ -1,10 +1,7 @@
-/* ==========================================
-   BOOKING STATUS BADGES
-   ========================================== */
 .status-tag {
   position: absolute;
-  top: 15px; /* Distance from top */
-  right: 15px; /* Distance from right */
+  top: 15px;
+  right: 15px;
   padding: 5px 12px;
   font-size: 0.7rem;
   border-radius: 6px;
@@ -21,7 +18,7 @@
 
 .status-accepted {
   background: #dcfce7;
-  color: #166534; /* Darker green for readability */
+  color: #166534;
   border: 1px solid #bbf7d0;
 }
 
@@ -37,9 +34,6 @@
   border: 1px solid #e5e7eb;
 }
 
-/* ==========================================
-   BOOKING CARD & GRID
-   ========================================== */
 .booking-grid {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
@@ -50,7 +44,7 @@
 .booking-card {
   position: relative;
   padding: 24px;
-  padding-top: 35px; /* Space for the floating badge */
+  padding-top: 35px;
   background: #ffffff;
   border: 1px solid #e5e7eb;
   border-radius: 16px;
@@ -64,9 +58,10 @@
   box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
   border-color: #3b82f6;
 }
+
 .booking-card-header {
   margin-bottom: 12px;
-  padding-right: 80px; /* Prevents title from running into the badge */
+  padding-right: 80px;
 }
 
 .property-title {
@@ -75,9 +70,7 @@
   color: #111827;
   margin: 0;
 }
-/* ==========================================
-   NEW: FEEDBACK BOXES
-   ========================================== */
+
 .success-box {
   background-color: #f0fdf4;
   border-left: 4px solid #22c55e;
@@ -98,9 +91,6 @@
   margin-top: 8px;
 }
 
-/* ==========================================
-   BUTTONS
-   ========================================== */
 .booking-actions {
   display: flex;
   gap: 12px;
@@ -131,7 +121,6 @@
   margin-top: 12px;
 }
 
-/* Red Cancel button for accepted bookings */
 .btn-cancel-danger {
   background: #ef4444;
   color: white;
@@ -149,9 +138,6 @@
   background: #dc2626;
 }
 
-/* ==========================================
-   AVAILABILITY ALERT (Property Details)
-   ========================================== */
 .booking-status-alert {
   background-color: #fffbeb;
   border: 1px solid #fcd34d;
@@ -224,9 +210,6 @@
   width: fit-content;
 }
 
-/* ==========================================
-   RESPONSIVE
-   ========================================== */
 @media (max-width: 640px) {
   .booking-grid {
     grid-template-columns: 1fr;
@@ -239,61 +222,48 @@
     padding-top: 20px;
   }
 }
+
 .btn-details-toggle {
   transition: background 0.2s ease;
 }
 
 .btn-details-toggle:hover {
-  background: #78350f !important; /* Darker amber */
+  background: #78350f !important;
 }
 
 .occupied-item {
   border-left: 3px solid #f59e0b;
-
   padding-left: 8px;
-
   background: #fffdf2;
 }
 
-/* Fix DatePicker width to match your form */
-
-/* ==========================================
-   NEAT CALENDAR BOX - REDUCING GAPS
-   ========================================== */
-
-/* Shrink the overall container width */
 .react-datepicker {
-  width: auto !important; /* Let it shrink to content */
+  width: auto !important;
   display: inline-block !important;
 }
 
-/* Reduce horizontal padding in the month container */
 .react-datepicker__month-container {
   float: none !important;
   padding: 0 5px !important;
 }
 
-/* Fix the header alignment */
 .react-datepicker__header {
   padding-top: 10px !important;
 }
 
-/* REDUCE GAP: Shrink the day name headers (Su, Mo, etc) */
 .react-datepicker__day-name {
-  width: 2.2rem !important; /* Reduced from 2.5rem */
-  margin: 0.1rem !important; /* Tighten horizontal spacing */
+  width: 2.2rem !important;
+  margin: 0.1rem !important;
   color: #6b7280 !important;
 }
 
-/* REDUCE GAP: Shrink the individual day cells */
 .react-datepicker__day {
-  width: 2.2rem !important; /* Match the day-name width */
-  line-height: 2.2rem !important; /* Controls vertical gap */
-  margin: 0.1rem !important; /* Tighten horizontal spacing */
+  width: 2.2rem !important;
+  line-height: 2.2rem !important;
+  margin: 0.1rem !important;
   border-radius: 6px !important;
 }
 
-/* Remove extra margins from the day grid */
 .react-datepicker__month {
   margin: 0.2rem !important;
 }

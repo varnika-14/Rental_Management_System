@@ -3,10 +3,8 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const nodemailer = require("nodemailer");
 
-// Temporary storage for OTPs
 const otpStore = {};
 
-// Email Configuration
 const transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
@@ -15,27 +13,24 @@ const transporter = nodemailer.createTransport({
   },
 });
 
-// Verify Mail Server Connection
 transporter.verify((error, success) => {
   if (error) {
-    console.log("❌ Mail Server Error:", error.message);
+    console.log("Mail Server Error:", error.message);
   } else {
-    console.log("✅ Mail Server is ready to send OTPs");
+    console.log("Mail Server is ready to send OTPs");
   }
 });
 
-// --- 1. SEND OTP ---
 exports.sendOTP = async (req, res) => {
   try {
     const { email } = req.body;
     if (!email) return res.status(400).json("Email is required");
 
-    // Check if user already exists before sending OTP
     const existingUser = await User.findOne({ email });
     if (existingUser) return res.status(400).json("Email already registered");
 
     const otp = Math.floor(100000 + Math.random() * 900000).toString();
-    otpStore[email] = { otp, expires: Date.now() + 300000 }; // 5 mins expiry
+    otpStore[email] = { otp, expires: Date.now() + 300000 };
 
     await transporter.sendMail({
       from: process.env.EMAIL_USER,
@@ -51,7 +46,6 @@ exports.sendOTP = async (req, res) => {
   }
 };
 
-// --- 2. VERIFY OTP ---
 exports.verifyOTP = async (req, res) => {
   const { email, otp } = req.body;
   const storedData = otpStore[email];
@@ -64,16 +58,12 @@ exports.verifyOTP = async (req, res) => {
     return res.status(400).json("Invalid or expired OTP");
   }
 
-  // Mark as verified so they can proceed to Step 3
   storedData.verified = true;
   res.json("OTP verified");
 };
 
-// --- 3. REGISTER ---
-// --- 3. REGISTER (Updated with Cloudinary & Mandatory Fields) ---
 exports.register = async (req, res) => {
   try {
-    // Destructure all new mandatory fields from req.body
     const {
       name,
       email,
@@ -91,7 +81,6 @@ exports.register = async (req, res) => {
       emergencyContact,
     } = req.body;
 
-    // Check for required text fields
     if (
       !name ||
       !email ||
@@ -107,19 +96,16 @@ exports.register = async (req, res) => {
       return res.status(400).json("All text fields are required");
     }
 
-    // Ensure they actually verified the OTP for this specific email
     if (!otpStore[email] || !otpStore[email].verified) {
       return res.status(400).json("Please verify your email first");
     }
 
-    // Check if files were uploaded to Cloudinary via Multer
     if (!req.files || !req.files["profilePhoto"] || !req.files["govtIdPhoto"]) {
       return res
         .status(400)
         .json("Both Profile Photo and Govt ID Photo are mandatory");
     }
 
-    // Cloudinary URLs provided by multer-storage-cloudinary
     const profilePhotoUrl = req.files["profilePhoto"][0].path;
     const govtIdPhotoUrl = req.files["govtIdPhoto"][0].path;
 
@@ -131,7 +117,6 @@ exports.register = async (req, res) => {
       email: email.trim().toLowerCase(),
       password: hashedPassword,
       role: role || "tenant",
-      // New Mandatory Fields
       age,
       qualification,
       occupation,
@@ -142,14 +127,12 @@ exports.register = async (req, res) => {
       upiId,
       bankDetails,
       phonenumber,
-      // Photo URLs
       profilePhoto: profilePhotoUrl,
       govtIdPhoto: govtIdPhotoUrl,
     });
 
     await user.save();
 
-    // Clear the OTP from memory after successful registration
     delete otpStore[email];
 
     res.status(201).json("User Registered Successfully");
@@ -158,7 +141,6 @@ exports.register = async (req, res) => {
     res.status(500).json("Registration failed: " + err.message);
   }
 };
-// --- 4. LOGIN ---
 exports.login = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -171,7 +153,6 @@ exports.login = async (req, res) => {
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) return res.status(400).json("Invalid password");
 
-    // Update login tracking
     user.lastLogin = new Date();
     user.loginCount = (user.loginCount || 0) + 1;
     await user.save();
@@ -199,7 +180,6 @@ exports.login = async (req, res) => {
   }
 };
 
-// --- GET PROFILE ---
 exports.getProfile = async (req, res) => {
   try {
     const user = await User.findById(req.user.id).select("-password");

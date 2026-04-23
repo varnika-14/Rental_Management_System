@@ -6,7 +6,6 @@ function Dashboard() {
   const [user, setUser] = useState(null);
 
   useEffect(() => {
-    // Re-read from localStorage every time Dashboard is viewed
     const storedUser = JSON.parse(localStorage.getItem("user"));
     if (storedUser) {
       setUser(storedUser);
@@ -17,7 +16,7 @@ function Dashboard() {
 
   return (
     <div className="dashboard">
-      <h1>Welcome, {user.name}</h1> {/* Updated name will show here */}
+      <h1>Welcome, {user.name}</h1>
       <div className="cards">
         {user.role === "owner" && (
           <>

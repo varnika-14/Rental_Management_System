@@ -7,11 +7,9 @@ function Register() {
   const navigate = useNavigate();
   const location = useLocation();
 
-  // Step and Loading state
   const [step, setStep] = useState(1);
   const [loading, setLoading] = useState(false);
 
-  // Initialize role strictly from navigation state
   const initialRole = location.state?.role || "tenant";
 
   const [form, setForm] = useState({
@@ -34,7 +32,6 @@ function Register() {
   const [profilePhoto, setProfilePhoto] = useState(null);
   const [govtIdPhoto, setGovtIdPhoto] = useState(null);
 
-  // Ensure role is updated if the user navigates directly between roles
   useEffect(() => {
     if (location.state?.role) {
       setForm((prev) => ({ ...prev, role: location.state.role }));
@@ -83,18 +80,14 @@ function Register() {
 
     const formData = new FormData();
 
-    // 1. Append all text fields
     Object.keys(form).forEach((key) => {
       formData.append(key, form[key]);
     });
 
-    // 2. Append the actual File objects
     if (profilePhoto) formData.append("profilePhoto", profilePhoto);
     if (govtIdPhoto) formData.append("govtIdPhoto", govtIdPhoto);
 
     try {
-      // IMPORTANT: Do NOT manually set 'Content-Type' header here.
-      // Axios/The browser will set it to multipart/form-data with the correct boundary automatically.
       const res = await API.post("/auth/register", formData);
 
       alert("Registration Successful!");
@@ -114,7 +107,6 @@ function Register() {
       <div className={`auth-container ${step === 3 ? "extended-auth" : ""}`}>
         <h2 style={{ textTransform: "capitalize" }}>Register as {form.role}</h2>
 
-        {/* STEP 1: SEND OTP */}
         {step === 1 && (
           <form onSubmit={handleSendOTP} className="auth-form">
             <p>Step 1: Email Verification</p>
@@ -132,7 +124,6 @@ function Register() {
           </form>
         )}
 
-        {/* STEP 2: VERIFY OTP */}
         {step === 2 && (
           <form onSubmit={handleVerifyOTP} className="auth-form">
             <p>Step 2: Enter Verification Code</p>
@@ -149,7 +140,6 @@ function Register() {
           </form>
         )}
 
-        {/* STEP 3: FULL DETAILS */}
         {step === 3 && (
           <form onSubmit={handleFinalSubmit} className="registration-grid">
             <div className="form-section">

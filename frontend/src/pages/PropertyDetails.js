@@ -22,20 +22,16 @@ function PropertyDetails() {
   useEffect(() => {
     const fetchPropertyAndStatus = async () => {
       try {
-        // 1. Fetch Property Details
         const res = await API.get(`/property/${id}`);
         setProperty(res.data);
 
-        // 2. Fetch Accepted Bookings for this property (The Schedule)
         const scheduleRes = await API.get(`/booking/property/${id}/accepted`);
         setAcceptedBookings(scheduleRes.data);
 
-        // 3. Get User Info from localStorage
         const user = JSON.parse(localStorage.getItem("user"));
         if (user) {
           setUserRole(user.role);
 
-          // 4. If Tenant, check if they already have a pending request
           if (user.role === "tenant") {
             const bookingsRes = await API.get("/booking/my-bookings");
             const pending = bookingsRes.data.some(
@@ -131,7 +127,6 @@ function PropertyDetails() {
           )}
           <p className="property-details-rent">₹ {property.rent} / month</p>
 
-          {/* NEW: Property Occupied Details Box */}
           <div className="booking-status-alert">
             <div
               style={{
@@ -245,7 +240,6 @@ function PropertyDetails() {
           )}
         </div>
 
-        {/* Updated Booking Section */}
         {userRole === "tenant" && (
           <div style={{ marginTop: "20px", marginBottom: "20px" }}>
             <button
@@ -299,7 +293,6 @@ function PropertyDetails() {
                 onBookingSuccess={() => {
                   setShowBookingForm(false);
                   setIsRequestPending(true);
-                  // Refresh schedule after success
                   window.location.reload();
                 }}
               />

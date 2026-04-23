@@ -9,7 +9,6 @@ function BookingForm({ propertyId, acceptedBookings, onBookingSuccess }) {
   const [durationType, setDurationType] = useState("months");
   const [loading, setLoading] = useState(false);
 
-  // Convert accepted bookings into date ranges for the calendar to block
   const excludeIntervals = acceptedBookings.map((b) => ({
     start: new Date(b.startDate),
     end: new Date(b.endDate),
@@ -43,7 +42,7 @@ function BookingForm({ propertyId, acceptedBookings, onBookingSuccess }) {
           onChange={(date) => setStartDate(date)}
           excludeDateIntervals={excludeIntervals}
           minDate={new Date()}
-          inline // Shows the full calendar visually
+          inline
         />
       </div>
 

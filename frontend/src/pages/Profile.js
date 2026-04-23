@@ -8,7 +8,6 @@ function Profile() {
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
-  // State for the Big Image Modal
   const [showModal, setShowModal] = useState(false);
 
   useEffect(() => {
@@ -34,7 +33,6 @@ function Profile() {
   const handleUpdate = async (e) => {
     e.preventDefault();
 
-    // All editable fields from your User Model
     const editableFields = [
       "name",
       "age",
@@ -58,11 +56,9 @@ function Profile() {
 
       const res = await API.put("/auth/profile/update", payload);
 
-      // 1. Update Profile UI
       setUser(res.data);
       setFormData(res.data);
 
-      // 2. Sync Dashboard Name: Update the name in localStorage
       const localAuth = JSON.parse(localStorage.getItem("user"));
       if (localAuth) {
         const updatedAuth = { ...localAuth, name: res.data.name };
@@ -82,7 +78,6 @@ function Profile() {
 
   return (
     <div className="profile-container">
-      {/* --- IMAGE MODAL (Opens Bigly in same tab) --- */}
       {showModal && (
         <div
           className="image-modal-overlay"
@@ -100,7 +95,6 @@ function Profile() {
       )}
 
       <div className="profile-card">
-        {/* --- Header Section --- */}
         <div className="profile-header">
           <img
             src={user?.profilePhoto || "https://via.placeholder.com/150"}
@@ -114,7 +108,6 @@ function Profile() {
           </div>
         </div>
 
-        {/* --- Form Section (All fields automatically editable) --- */}
         <form onSubmit={handleUpdate} className="profile-grid">
           <div className="info-group">
             <label>Full Name</label>
@@ -217,7 +210,6 @@ function Profile() {
             />
           </div>
 
-          {/* --- Govt ID Display --- */}
           <div className="info-group full-width">
             <label>Verified Government ID Document</label>
             <div
@@ -246,7 +238,6 @@ function Profile() {
             />
           </div>
 
-          {/* Add Permanent Address as a Full Width Textarea */}
           <div className="info-group full-width">
             <label>Permanent Address</label>
             <textarea
@@ -256,7 +247,6 @@ function Profile() {
               placeholder="Enter your full permanent address"
             />
           </div>
-          {/* --- Save Button --- */}
           <div className="profile-actions">
             <button type="submit" className="save-btn" disabled={saving}>
               {saving ? "Saving Changes..." : "Save Profile"}
