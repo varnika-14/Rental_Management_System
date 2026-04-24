@@ -110,7 +110,7 @@ function AddProperty() {
 
         <textarea
           name="description"
-          placeholder="Description"
+          placeholder="Description(amenities, nearby places, etc.)"
           value={form.description}
           onChange={handleChange}
           required
@@ -120,7 +120,6 @@ function AddProperty() {
           <option value="Apartment">Apartment</option>
           <option value="House">House</option>
           <option value="Villa">Villa</option>
-          <option value="Shop">Shop</option>
         </select>
 
         <input

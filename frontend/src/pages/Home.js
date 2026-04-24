@@ -22,12 +22,6 @@ function Home() {
           <button className="btn-text" onClick={() => navigate("/login")}>
             Login
           </button>
-          <button
-            className="btn-primary-sm"
-            onClick={() => navigate("/register")}
-          >
-            Get Started
-          </button>
         </div>
       </nav>
 
@@ -37,14 +31,14 @@ function Home() {
           style={{ backgroundImage: `url(${tenantImg})` }}
         >
           <div className="panel-content">
-            <span className="panel-subtitle">For Seekers</span>
+            <span className="panel-subtitle">For Tenants</span>
             <h2 className="panel-title">
               Find your <br />
               <span className="accent-text">perfect</span> space.
             </h2>
             <p className="panel-description">
-              Browse curated listings, connect with verified owners, and secure
-              your new home effortlessly.
+              Browse properties, connect with owners, and find your new home
+              effortlessly.
             </p>
             <button
               className="panel-cta"
@@ -66,8 +60,8 @@ function Home() {
               <span className="accent-text">clarity</span> & ease.
             </h2>
             <p className="panel-description">
-              Verify your property, list in minutes, accept bookings, and track
-              your revenue securely.
+              List your properties in minutes, accept bookings and connect with
+              tenants.
             </p>
             <button
               className="panel-cta cta-dark"

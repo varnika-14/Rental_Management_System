@@ -2,7 +2,10 @@ const User = require("../models/User");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const nodemailer = require("nodemailer");
-
+const Property = require("../models/Property");
+const Booking = require("../models/Booking");
+const Message = require("../models/Message");
+const Conversation = require("../models/Conversation");
 const otpStore = {};
 
 const transporter = nodemailer.createTransport({
@@ -234,5 +237,80 @@ exports.updateProfile = async (req, res) => {
     res.json(updatedUser);
   } catch (err) {
     res.status(500).json("Update failed");
+  }
+};
+
+exports.getDashboardStats = async (req, res) => {
+  try {
+    const userId = req.user.id;
+    const userRole = req.user.role;
+
+    // Count unread messages - messages not sent by current user and not read by current user
+    const conversations = await Conversation.find({
+      $or: [
+        { owner: userId },
+        { tenant: userId }
+      ]
+    }).select('_id');
+    
+    const conversationIds = conversations.map(conv => conv._id);
+    
+    const unreadCount = await Message.countDocuments({
+      conversation: { $in: conversationIds },
+      $and: [
+        { sender: { $ne: userId } }, // Not sent by current user
+        { readBy: { $ne: userId } } // Not read by current user
+      ]
+    });
+
+    let stats = {
+      unreadMessages: unreadCount,
+    };
+
+    if (userRole === "owner") {
+      // Owner stats
+      const totalListings = await Property.countDocuments({ owner: userId });
+      
+      // Booking requests for owner's properties
+      const bookingRequests = await Booking.countDocuments({
+        owner: userId,
+        status: "pending"
+      });
+
+      stats = {
+        ...stats,
+        primaryLabel: "My Listings",
+        primaryValue: totalListings,
+        bookingRequests: bookingRequests,
+        status: "Verified",
+      };
+    } else {
+      // Tenant stats
+      const totalBookings = await Booking.countDocuments({ tenant: userId });
+      
+      // Count bookings by status
+      const acceptedBookings = await Booking.countDocuments({
+        tenant: userId,
+        status: "accepted"
+      });
+      const pendingBookings = await Booking.countDocuments({
+        tenant: userId,
+        status: "pending"
+      });
+
+      stats = {
+        ...stats,
+        primaryLabel: "My Bookings",
+        primaryValue: totalBookings,
+        acceptedBookings: acceptedBookings,
+        pendingBookings: pendingBookings,
+        status: "Verified",
+      };
+    }
+
+    res.status(200).json(stats);
+  } catch (error) {
+    console.error("Stats Error:", error);
+    res.status(500).json({ message: "Error fetching stats" });
   }
 };

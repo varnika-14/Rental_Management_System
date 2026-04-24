@@ -36,7 +36,7 @@ function BookingForm({ propertyId, acceptedBookings, onBookingSuccess }) {
   return (
     <form className="booking-form-card" onSubmit={handleSubmit}>
       <div className="form-group">
-        <label>Select Start Date (White dates are free)</label>
+        <label>Select Start Date (White dates are occupied)</label>
         <DatePicker
           selected={startDate}
           onChange={(date) => setStartDate(date)}

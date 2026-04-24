@@ -19,6 +19,14 @@ function PropertyDetails() {
   const [acceptedBookings, setAcceptedBookings] = useState([]);
   const [showOccupiedDetails, setShowOccupiedDetails] = useState(false);
 
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    const day = date.getDate();
+    const month = date.getMonth() + 1;
+    const year = date.getFullYear();
+    return `${day}/${month}/${year}`;
+  };
+
   useEffect(() => {
     const fetchPropertyAndStatus = async () => {
       try {
@@ -125,8 +133,82 @@ function PropertyDetails() {
               <b>Full address:</b> {property.address}
             </p>
           )}
+          <p className="property-details-type">
+            <b>Type:</b> {property.type}
+          </p>
+          <p className="property-details-description">{property.description}</p>
           <p className="property-details-rent">₹ {property.rent} / month</p>
 
+          {isOwner && (
+            <div className="property-owner-actions">
+              <button
+                type="button"
+                className="property-action-btn edit-btn"
+                onClick={() => navigate(`/edit-property/${property._id}`)}
+              >
+                Edit Property
+              </button>
+              <button
+                type="button"
+                className="property-action-btn delete-btn"
+                onClick={handleDelete}
+              >
+                Delete Property
+              </button>
+            </div>
+          )}
+        </div>
+        <div className="property-photos-section">
+          <h3>Photos</h3>
+          {images.length > 0 && (
+            <div className="property-details-gallery">
+              {images.map((img, index) => (
+                <button
+                  key={index}
+                  type="button"
+                  className="property-image-button"
+                  onClick={() => setSelectedImage(getImageUrl(img))}
+                >
+                  <img
+                    src={getImageUrl(img)}
+                    alt={`${property.title} ${index + 1}`}
+                    className="property-details-image"
+                  />
+                </button>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {property.owner && userRole === "tenant" && (
+          <div className="property-owner-section">
+            <h3>Owner Details</h3>
+            <div className="property-details-owner">
+              <p>
+                <b>Owner:</b> {property.owner.name} ({property.owner.email})
+              </p>
+              <div className="owner-actions-row">
+                <button
+                  type="button"
+                  className="property-action-btn view-btn"
+                  onClick={() => navigate(`/users/${property.owner._id}`)}
+                >
+                  Owner Details
+                </button>
+                <button
+                  type="button"
+                  className="property-action-btn view-btn"
+                  onClick={handleStartChat}
+                >
+                  Chat with Owner
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        <div className="property-occupied-section">
+          <h3>Property Occupied Details</h3>
           <div className="booking-status-alert">
             <div
               style={{
@@ -138,7 +220,7 @@ function PropertyDetails() {
               <span>
                 <strong>
                   {acceptedBookings.length > 0
-                    ? "📅 Property Occupied Details"
+                    ? "📅 Property Occupied"
                     : "✅ Property Available"}
                 </strong>
               </span>
@@ -176,9 +258,8 @@ function PropertyDetails() {
                     className="occupied-item"
                     style={{ fontSize: "0.85rem", marginBottom: "5px" }}
                   >
-                    🚫 Reserved:{" "}
-                    <b>{new Date(b.startDate).toLocaleDateString()}</b> to{" "}
-                    <b>{new Date(b.endDate).toLocaleDateString()}</b>
+                    🚫 Reserved: <b>{formatDate(b.startDate)}</b> to{" "}
+                    <b>{formatDate(b.endDate)}</b>
                   </div>
                 ))}
                 <p
@@ -196,60 +277,10 @@ function PropertyDetails() {
               </p>
             )}
           </div>
-
-          <p className="property-details-type">
-            <b>Type:</b> {property.type}
-          </p>
-
-          <p className="property-details-description">{property.description}</p>
-
-          {property.owner && (
-            <div className="property-details-owner">
-              <p>
-                <b>Owner:</b> {property.owner.name} ({property.owner.email})
-              </p>
-              {userRole === "tenant" && property.owner?._id && (
-                <button
-                  type="button"
-                  className="property-action-btn view-btn"
-                  onClick={() => navigate(`/users/${property.owner._id}`)}
-                >
-                  Owner Details
-                </button>
-              )}
-            </div>
-          )}
-
-          {isOwner && (
-            <div className="property-owner-actions">
-              <button
-                type="button"
-                className="property-action-btn edit-btn"
-                onClick={() => navigate(`/edit-property/${property._id}`)}
-              >
-                Edit Property
-              </button>
-              <button
-                type="button"
-                className="property-action-btn delete-btn"
-                onClick={handleDelete}
-              >
-                Delete Property
-              </button>
-            </div>
-          )}
         </div>
 
         {userRole === "tenant" && (
-          <div style={{ marginTop: "20px", marginBottom: "20px" }}>
-            <button
-              type="button"
-              className="property-action-btn view-btn"
-              onClick={handleStartChat}
-              style={{ marginBottom: "12px" }}
-            >
-              Chat with Owner
-            </button>
+          <div className="property-booking-section">
             {isRequestPending ? (
               <button
                 disabled
@@ -269,6 +300,7 @@ function PropertyDetails() {
               </button>
             ) : !showBookingForm ? (
               <button
+                className="booking-date-btn"
                 style={{
                   backgroundColor:
                     acceptedBookings.length > 0 ? "#6366f1" : "#3b82f6",
@@ -287,36 +319,18 @@ function PropertyDetails() {
                   : "Request Booking"}
               </button>
             ) : (
-              <BookingForm
-                propertyId={property._id}
-                acceptedBookings={acceptedBookings} // PASSING THE SCHEDULE HERE
-                onBookingSuccess={() => {
-                  setShowBookingForm(false);
-                  setIsRequestPending(true);
-                  window.location.reload();
-                }}
-              />
-            )}
-          </div>
-        )}
-
-        <b>Photos</b>
-        {images.length > 0 && (
-          <div className="property-details-gallery">
-            {images.map((img, index) => (
-              <button
-                key={index}
-                type="button"
-                className="property-image-button"
-                onClick={() => setSelectedImage(getImageUrl(img))}
-              >
-                <img
-                  src={getImageUrl(img)}
-                  alt={`${property.title} ${index + 1}`}
-                  className="property-details-image"
+              <div className="booking-form-wrapper">
+                <BookingForm
+                  propertyId={property._id}
+                  acceptedBookings={acceptedBookings}
+                  onBookingSuccess={() => {
+                    setShowBookingForm(false);
+                    setIsRequestPending(true);
+                    window.location.reload();
+                  }}
                 />
-              </button>
-            ))}
+              </div>
+            )}
           </div>
         )}
       </div>

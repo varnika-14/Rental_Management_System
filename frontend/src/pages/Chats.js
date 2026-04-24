@@ -21,6 +21,7 @@ function Chats() {
   const [loading, setLoading] = useState(true);
   const [sending, setSending] = useState(false);
   const socketRef = useRef(null);
+  const messagesEndRef = useRef(null);
   const selectedConversationIdRef = useRef(null);
 
   const getInitials = (name) => {
@@ -34,8 +35,18 @@ function Chats() {
   };
 
   const formatTime = (value) =>
-    new Date(value).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" });
+    new Date(value).toLocaleTimeString([], {
+      hour: "2-digit",
+      minute: "2-digit",
+    });
 
+  const scrollToBottom = () => {
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  };
+
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
   const loadConversations = async () => {
     try {
       const res = await getConversations();
@@ -209,7 +220,9 @@ function Chats() {
         <aside className="chat-sidebar">
           <div className="chat-sidebar-header">All Conversations</div>
           {conversations.length === 0 ? (
-            <p className="chat-empty">No chats yet. Start from property screens.</p>
+            <p className="chat-empty">
+              No chats yet. Start from property screens.
+            </p>
           ) : (
             conversations.map((conversation) => {
               const other =
@@ -221,7 +234,9 @@ function Chats() {
                   key={conversation._id}
                   type="button"
                   className={`chat-list-item ${
-                    selectedConversation?._id === conversation._id ? "active" : ""
+                    selectedConversation?._id === conversation._id
+                      ? "active"
+                      : ""
                   }`}
                   onClick={() => {
                     setSelectedConversation(conversation);
@@ -235,7 +250,9 @@ function Chats() {
                   }}
                 >
                   <div className="chat-list-top">
-                    <div className="chat-avatar">{getInitials(other?.name)}</div>
+                    <div className="chat-avatar">
+                      {getInitials(other?.name)}
+                    </div>
                     <div className="chat-list-main">
                       <div className="chat-list-title">
                         {other?.name || "Unknown User"}
@@ -254,7 +271,9 @@ function Chats() {
                     {conversation.lastMessage || "No messages yet"}
                   </div>
                   {conversation.unreadCount > 0 && (
-                    <span className="chat-unread-badge">{conversation.unreadCount}</span>
+                    <span className="chat-unread-badge">
+                      {conversation.unreadCount}
+                    </span>
                   )}
                 </button>
               );
@@ -291,6 +310,7 @@ function Chats() {
                   </div>
                 ))
               )}
+              {messages.length > 0 && <div ref={messagesEndRef} />}
             </div>
             <div className="chat-input-row">
               <input

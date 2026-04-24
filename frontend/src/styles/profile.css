@@ -223,12 +223,219 @@
   }
 }
 
-@media (max-width: 640px) {
+@media (max-width: 768px) {
+  .profile-container {
+    padding: 20px;
+  }
+  
+  .profile-card {
+    padding: 25px;
+  }
+  
+  .profile-header {
+    padding-bottom: 20px;
+    margin-bottom: 25px;
+  }
+  
+  .profile-pic-large {
+    width: 120px;
+    height: 120px;
+    border-width: 4px;
+  }
+  
+  .profile-header h2 {
+    font-size: 1.6rem;
+  }
+  
+  .profile-email {
+    font-size: 0.9rem;
+  }
+  
+  .role-badge {
+    font-size: 0.75rem;
+    padding: 4px 12px;
+  }
+  
   .profile-grid {
     grid-template-columns: 1fr;
+    gap: 20px;
   }
+  
   .full-width,
   .profile-actions {
     grid-column: span 1;
+  }
+  
+  .info-group input,
+  .info-group textarea {
+    padding: 12px;
+    font-size: 0.95rem;
+  }
+  
+  .id-photo-preview {
+    padding: 15px;
+  }
+  
+  .save-btn {
+    padding: 12px 40px;
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 640px) {
+  .profile-container {
+    padding: 15px;
+  }
+  
+  .profile-card {
+    padding: 20px;
+  }
+  
+  .profile-header {
+    padding-bottom: 15px;
+    margin-bottom: 20px;
+  }
+  
+  .profile-pic-large {
+    width: 100px;
+    height: 100px;
+    border-width: 3px;
+  }
+  
+  .profile-header h2 {
+    font-size: 1.4rem;
+  }
+  
+  .profile-email {
+    font-size: 0.85rem;
+  }
+  
+  .role-badge {
+    font-size: 0.7rem;
+    padding: 3px 10px;
+  }
+  
+  .profile-grid {
+    gap: 15px;
+  }
+  
+  .info-group {
+    gap: 6px;
+  }
+  
+  .info-group label {
+    font-size: 0.85rem;
+  }
+  
+  .info-group input,
+  .info-group textarea {
+    padding: 10px;
+    font-size: 0.9rem;
+  }
+  
+  .id-photo-preview {
+    padding: 12px;
+  }
+  
+  .help-text {
+    font-size: 0.75rem;
+    margin-top: 6px;
+  }
+  
+  .profile-actions {
+    margin-top: 20px;
+  }
+  
+  .save-btn {
+    padding: 10px 30px;
+    font-size: 0.95rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .profile-container {
+    padding: 10px;
+  }
+  
+  .profile-card {
+    padding: 15px;
+  }
+  
+  .profile-header {
+    padding-bottom: 12px;
+    margin-bottom: 15px;
+  }
+  
+  .profile-pic-large {
+    width: 85px;
+    height: 85px;
+    border-width: 2px;
+  }
+  
+  .profile-header h2 {
+    font-size: 1.2rem;
+  }
+  
+  .profile-email {
+    font-size: 0.8rem;
+  }
+  
+  .role-badge {
+    font-size: 0.65rem;
+    padding: 2px 8px;
+  }
+  
+  .profile-grid {
+    gap: 12px;
+  }
+  
+  .info-group {
+    gap: 5px;
+  }
+  
+  .info-group label {
+    font-size: 0.8rem;
+  }
+  
+  .info-group input,
+  .info-group textarea {
+    padding: 8px;
+    font-size: 0.85rem;
+  }
+  
+  .id-photo-preview {
+    padding: 10px;
+  }
+  
+  .help-text {
+    font-size: 0.7rem;
+    margin-top: 5px;
+  }
+  
+  .profile-actions {
+    margin-top: 15px;
+  }
+  
+  .save-btn {
+    padding: 8px 25px;
+    font-size: 0.9rem;
+    width: 100%;
+    max-width: 200px;
+  }
+  
+  .profile-back-button {
+    padding: 0.35rem 0.7rem;
+    font-size: 0.85rem;
+  }
+  
+  .modal-content {
+    width: 95vw;
+    height: 85vh;
+  }
+  
+  .close-modal {
+    top: 15px;
+    right: 20px;
+    font-size: 40px;
   }
 }

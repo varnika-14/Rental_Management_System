@@ -49,15 +49,13 @@ function MyBookings() {
   const handleCancel = async (id, status) => {
     const message =
       status === "accepted"
-        ? "This booking is already accepted. Cancelling will release the property for others. Are you sure?"
-        : "Are you sure you want to cancel this request?";
+        ? "This booking is already accepted. Are you sure you want to cancel?"
+        : "Are you sure you want to withdraw this request?";
 
     if (window.confirm(message)) {
       try {
         await API.patch(`/booking/${id}/cancel`);
-        alert(
-          "Booking cancelled successfully. The property is now available for others.",
-        );
+        alert("Booking cancelled successfully.");
         fetchMyBookings();
       } catch (err) {
         alert(err.response?.data?.message || "Cancellation failed");
@@ -67,112 +65,116 @@ function MyBookings() {
 
   if (loading)
     return (
-      <div className="property-container">
-        <p>Loading your bookings...</p>
-      </div>
+      <div className="loading-container">Loading your applications...</div>
     );
 
   return (
-    <div className="property-container">
-      <h2 className="section-title">My Rental Applications</h2>
-      {bookings.length === 0 ? (
-        <p className="empty-state">
-          You haven't made any booking requests yet.
+    <div className="booking-page-container">
+      <div className="page-header">
+        <h2 className="page-title">My Rental Applications</h2>
+        <p className="page-subtitle">
+          Track the status of your booking requests and coordinate with owners.
         </p>
+      </div>
+
+      {bookings.length === 0 ? (
+        <div className="empty-state">
+          <span>🏠</span>
+          <p>You haven't made any booking requests yet.</p>
+          <button
+            className="btn-primary"
+            onClick={() => navigate("/properties")}
+            style={{ width: "auto", marginTop: "1rem" }}
+          >
+            Browse Properties
+          </button>
+        </div>
       ) : (
         <div className="booking-grid">
           {bookings.map((b) => (
-            <div key={b._id} className="booking-card">
-              <div className="booking-card-header">
-                <div>
-                  <h3 className="property-title">
-                    {b.property?.title || "Property Details Unavailable"}
-                  </h3>
-                  <p className="property-loc">📍 {b.property?.location}</p>
-                </div>
-                <span className={`status-tag status-${b.status}`}>
-                  {b.status}
-                </span>
+            <div key={b._id} className="request-card">
+              <div className="request-header">
+                <span className={`status-badge ${b.status}`}>{b.status}</span>
+                <h3 className="property-name">
+                  {b.property?.title || "Property Unavailable"}
+                </h3>
+                <p className="property-address">📍 {b.property?.location}</p>
               </div>
 
-              <div className="booking-card-body">
-                <div className="detail-row">
-                  <span>
-                    🔑 <b>Owner:</b>
-                  </span>
-                  <span>{b.owner?.name}</span>
-                </div>
-                {b.owner?._id && (
-                  <button
-                    type="button"
-                    className="btn-view-details"
-                    onClick={() => navigate(`/users/${b.owner._id}`)}
+              <div className="request-content">
+                <div className="tenant-info">
+                  <div
+                    className="avatar-placeholder"
+                    style={{ background: "#10b981" }}
                   >
-                    Owner Details
-                  </button>
-                )}
-                <div className="detail-row">
-                  <span>
-                    📧 <b>Contact:</b>
-                  </span>
-                  <span>{b.owner?.email}</span>
+                    {b.owner?.name?.charAt(0)}
+                  </div>
+                  <div className="tenant-meta">
+                    <strong>{b.owner?.name} (Owner)</strong>
+                    <div className="tenant-actions">
+                      <button
+                        onClick={() => navigate(`/users/${b.owner?._id}`)}
+                      >
+                        View Profile
+                      </button>
+                      <button onClick={() => handleChatWithOwner(b)}>
+                        Send Message
+                      </button>
+                    </div>
+                  </div>
                 </div>
-                <div className="detail-row">
-                  <span>
-                    📅 <b>Start Date:</b>
-                  </span>
-                  <span>{new Date(b.startDate).toLocaleDateString()}</span>
-                </div>
-                <div className="detail-row">
-                  <span>
-                    ⏳ <b>Stay Period:</b>
-                  </span>
-                  <span>
-                    {b.duration} {b.durationType}
-                  </span>
-                </div>
-                <div className="detail-row">
-                  <span>
-                    💳 <b>Total Commitment:</b>
-                  </span>
-                  <span className="total-price">
-                    ₹{b.totalRent || b.monthlyRent * b.duration}
-                  </span>
+
+                <hr className="divider" />
+
+                <div className="details-list">
+                  <div className="detail-item">
+                    <span className="label">Move-in Date</span>
+                    <span className="value">
+                      {new Date(b.startDate).toLocaleDateString("en-GB")}
+                    </span>
+                  </div>
+                  <div className="detail-item">
+                    <span className="label">Duration</span>
+                    <span className="value">
+                      {b.duration} {b.durationType}
+                    </span>
+                  </div>
+                  <div className="detail-item">
+                    <span className="label">Total Commitment</span>
+                    <span className="value accent">
+                      ₹
+                      {(
+                        b.totalRent || b.monthlyRent * b.duration
+                      ).toLocaleString()}
+                    </span>
+                  </div>
                 </div>
 
                 {b.status === "rejected" && b.rejectionReason && (
-                  <div className="rejection-box">
-                    <b>Reason:</b> {b.rejectionReason}
+                  <div className="rejection-box" style={{ marginTop: "1rem" }}>
+                    <strong>Reason:</strong> {b.rejectionReason}
                   </div>
                 )}
 
-                <button
-                  type="button"
-                  className="btn-view-details"
-                  onClick={() => handleChatWithOwner(b)}
-                >
-                  Chat with Owner
-                </button>
-
                 {b.status === "accepted" && (
-                  <div className="success-box">
-                    🎉 Your request was accepted! You can now coordinate move-in
-                    details with the owner.
+                  <div className="success-box" style={{ marginTop: "1rem" }}>
+                    🎉 <b>Accepted!</b> You can now coordinate move-in details
+                    via chat.
                   </div>
                 )}
               </div>
 
               {(b.status === "pending" || b.status === "accepted") && (
-                <button
-                  className={
-                    b.status === "accepted" ? "btn-cancel-danger" : "btn-cancel"
-                  }
-                  onClick={() => handleCancel(b._id, b.status)}
-                >
-                  {b.status === "accepted"
-                    ? "Cancel Accepted Booking"
-                    : "Cancel Request"}
-                </button>
+                <div className="request-footer">
+                  <button
+                    className={`btn-secondary ${b.status === "accepted" ? "reject" : ""}`}
+                    onClick={() => handleCancel(b._id, b.status)}
+                  >
+                    {b.status === "accepted"
+                      ? "Cancel Booking"
+                      : "Withdraw Request"}
+                  </button>
+                </div>
               )}
             </div>
           ))}

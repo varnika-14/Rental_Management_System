@@ -11,6 +11,7 @@ const {
   getProfile,
   updateProfile,
   getUserProfileById,
+  getDashboardStats,
 } = require("../controllers/authController");
 
 router.post(
@@ -29,5 +30,5 @@ router.post("/verify-otp", verifyOTP);
 router.get("/profile", authMiddleware, getProfile);
 router.put("/profile/update", authMiddleware, updateProfile);
 router.get("/profile/:id", authMiddleware, getUserProfileById);
-
+router.get("/stats", authMiddleware, getDashboardStats);
 module.exports = router;

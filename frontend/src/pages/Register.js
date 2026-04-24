@@ -143,7 +143,7 @@ function Register() {
         {step === 3 && (
           <form onSubmit={handleFinalSubmit} className="registration-grid">
             <div className="form-section">
-              <h4>1. Personal</h4>
+              <h4>Personal</h4>
               <label className="file-label">Profile Photo</label>
               <input
                 type="file"
@@ -187,7 +187,7 @@ function Register() {
               />
             </div>
             <div className="form-section">
-              <h4>2. Professional</h4>
+              <h4>Professional</h4>
               <input
                 name="qualification"
                 placeholder="Qualification"
@@ -210,7 +210,7 @@ function Register() {
             </div>
 
             <div className="form-section">
-              <h4>3. Identity</h4>
+              <h4>Identity</h4>
               <input
                 name="govtIdNumber"
                 placeholder="Aadhar / PAN Number"
@@ -227,7 +227,7 @@ function Register() {
             </div>
 
             <div className="form-section">
-              <h4>4. Payments</h4>
+              <h4>Payments</h4>
               <input
                 name="upiId"
                 placeholder="UPI ID (e.g. user@okaxis)"
@@ -240,6 +240,7 @@ function Register() {
                 onChange={handleChange}
                 required
               />
+              <h4>Set Password</h4>
               <input
                 name="password"
                 type="password"

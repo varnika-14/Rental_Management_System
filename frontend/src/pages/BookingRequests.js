@@ -44,7 +44,6 @@ function BookingRequests() {
       ) {
         return alert("Missing data to start chat");
       }
-
       const res = await startConversation({
         propertyId: requestItem.property._id,
         ownerId: currentUser._id,
@@ -52,103 +51,96 @@ function BookingRequests() {
       });
       navigate(`/chats?conversation=${res.data._id}`);
     } catch (err) {
-      console.error("Error starting chat:", err);
       alert(err.response?.data?.message || "Unable to start chat");
     }
   };
 
   if (loading)
-    return (
-      <div className="property-container">
-        <p>Loading requests...</p>
-      </div>
-    );
+    return <div className="loading-container">Fetching Requests...</div>;
 
   return (
-    <div className="property-container">
-      <h2 className="section-title">Incoming Property Requests</h2>
+    <div className="booking-page-container">
+      <div className="page-header">
+        <h2 className="page-title">Incoming Requests</h2>
+        <p className="page-subtitle">
+          Review and manage tenant booking inquiries for your properties.
+        </p>
+      </div>
+
       {requests.length === 0 ? (
-        <p className="empty-state">No booking requests received yet.</p>
+        <div className="empty-state">
+          <span>📩</span>
+          <p>No booking requests received yet.</p>
+        </div>
       ) : (
         <div className="booking-grid">
           {requests.map((r) => (
-            <div key={r._id} className="booking-card">
-              <div className="booking-card-header">
-                <div>
-                  <h3 className="property-title">
-                    {r.property?.title || "Deleted Property"}
-                  </h3>
-                  <p className="property-loc">📍 {r.property?.location}</p>
-                </div>
-                <span className={`status-tag status-${r.status}`}>
-                  {r.status}
-                </span>
+            <div key={r._id} className="request-card">
+              <div className="request-header">
+                <span className={`status-badge ${r.status}`}>{r.status}</span>
+                <h3 className="property-name">
+                  {r.property?.title || "Unknown Property"}
+                </h3>
+                <p className="property-address">📍 {r.property?.location}</p>
               </div>
 
-              <div className="booking-card-body">
-                <div className="detail-row">
-                  <span>
-                    👤 <b>Tenant:</b>
-                  </span>
-                  <span>{r.tenant?.name}</span>
+              <div className="request-content">
+                <div className="tenant-info">
+                  <div className="avatar-placeholder">
+                    {r.tenant?.name?.charAt(0)}
+                  </div>
+                  <div className="tenant-meta">
+                    <strong>{r.tenant?.name}</strong>
+                    <div className="tenant-actions">
+                      <button
+                        onClick={() => navigate(`/users/${r.tenant._id}`)}
+                      >
+                        Profile
+                      </button>
+                      <button onClick={() => handleChatWithTenant(r)}>
+                        Message
+                      </button>
+                    </div>
+                  </div>
                 </div>
-                {r.tenant?._id && (
-                  <button
-                    type="button"
-                    className="btn-view-details"
-                    onClick={() => navigate(`/users/${r.tenant._id}`)}
-                  >
-                    Tenant Details
-                  </button>
-                )}
-                <button
-                  type="button"
-                  className="btn-view-details"
-                  onClick={() => handleChatWithTenant(r)}
-                >
-                  Chat with Tenant
-                </button>
-                <div className="detail-row">
-                  <span>
-                    📧 <b>Email:</b>
-                  </span>
-                  <span>{r.tenant?.email}</span>
-                </div>
-                <div className="detail-row">
-                  <span>
-                    📅 <b>Move-in:</b>
-                  </span>
-                  <span>{new Date(r.startDate).toLocaleDateString()}</span>
-                </div>
-                <div className="detail-row">
-                  <span>
-                    ⏳ <b>Duration:</b>
-                  </span>
-                  <span>
-                    {r.duration} {r.durationType}
-                  </span>
-                </div>
-                <div className="detail-row">
-                  <span>
-                    💰 <b>Rent:</b>
-                  </span>
-                  <span>₹{r.monthlyRent} /mo</span>
+
+                <hr className="divider" />
+
+                <div className="details-list">
+                  <div className="detail-item">
+                    <span className="label">Move-in Date</span>
+                    <span className="value">
+                      {new Date(r.startDate).toLocaleDateString("en-GB")}
+                    </span>
+                  </div>
+                  <div className="detail-item">
+                    <span className="label">Stay Duration</span>
+                    <span className="value">
+                      {r.duration} {r.durationType}
+                    </span>
+                  </div>
+                  <div className="detail-item">
+                    <span className="label">Monthly Rent</span>
+                    <span className="value accent">
+                      ₹{r.monthlyRent.toLocaleString()}
+                    </span>
+                  </div>
                 </div>
               </div>
 
               {r.status === "pending" && (
-                <div className="booking-actions">
+                <div className="request-footer">
                   <button
-                    className="btn-accept"
-                    onClick={() => handleAction(r._id, "accept")}
-                  >
-                    Accept
-                  </button>
-                  <button
-                    className="btn-reject"
+                    className="btn-secondary reject"
                     onClick={() => handleAction(r._id, "reject")}
                   >
                     Reject
+                  </button>
+                  <button
+                    className="btn-primary accept"
+                    onClick={() => handleAction(r._id, "accept")}
+                  >
+                    Accept Request
                   </button>
                 </div>
               )}

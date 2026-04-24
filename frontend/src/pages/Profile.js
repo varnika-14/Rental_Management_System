@@ -120,7 +120,7 @@ function Profile() {
           </div>
 
           <div className="info-group">
-            <label>Email Address (Immutable)</label>
+            <label>Email Address</label>
             <input
               name="email"
               value={user?.email || ""}
@@ -171,7 +171,7 @@ function Profile() {
           </div>
 
           <div className="info-group">
-            <label>Highest Qualification</label>
+            <label>Qualification</label>
             <input
               name="qualification"
               value={formData.qualification || ""}
@@ -229,7 +229,7 @@ function Profile() {
             <p className="help-text">Click image above to view bigly</p>
           </div>
           <div className="info-group">
-            <label>Emergency Contact No</label>
+            <label>Emergency Contact Number</label>
             <input
               name="emergencyContact"
               value={formData.emergencyContact || ""}
