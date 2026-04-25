@@ -163,30 +163,30 @@
   .dashboard-wrapper {
     padding: 1rem;
   }
-  
+
   .welcome-banner {
     flex-direction: column;
     align-items: flex-start;
     gap: 1rem;
   }
-  
+
   .welcome-text h1 {
     font-size: 1.5rem;
   }
-  
+
   .overview-stats {
     grid-template-columns: 1fr;
     gap: 1rem;
     margin-bottom: 2rem;
   }
-  
+
   .stat-card {
     padding: 1.25rem;
     flex-direction: column;
     align-items: flex-start;
     gap: 1rem;
   }
-  
+
   .stat-icon {
     position: absolute;
     top: 1.25rem;
@@ -195,33 +195,33 @@
     height: 40px;
     font-size: 1.2rem;
   }
-  
+
   .stat-info {
     width: 100%;
     padding-right: 3rem;
   }
-  
+
   .stat-info .number {
     font-size: 1.5rem;
   }
-  
+
   .button-grid {
     grid-template-columns: 1fr;
     gap: 1rem;
   }
-  
+
   .feature-btn {
     padding: 1.25rem;
   }
-  
+
   .btn-icon {
     font-size: 1.3rem;
   }
-  
+
   .dashboard-grid {
     gap: 2rem;
   }
-  
+
   .group-title {
     font-size: 1rem;
     margin-bottom: 1rem;
@@ -232,29 +232,29 @@
   .dashboard-wrapper {
     padding: 0.75rem;
   }
-  
+
   .stat-card {
     padding: 1rem;
   }
-  
+
   .stat-icon {
     width: 35px;
     height: 35px;
     font-size: 1rem;
   }
-  
+
   .stat-info {
     padding-right: 2.5rem;
   }
-  
+
   .stat-info .number {
     font-size: 1.3rem;
   }
-  
+
   .feature-btn {
     padding: 1rem;
   }
-  
+
   .btn-icon {
     font-size: 1.2rem;
   }

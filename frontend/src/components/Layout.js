@@ -1,9 +1,10 @@
-import React from "react";
+import React, { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import "../styles/layout.css";
 
 function Layout({ children }) {
   const navigate = useNavigate();
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const user = JSON.parse(localStorage.getItem("user"));
 
   const handleLogout = () => {
@@ -11,28 +12,57 @@ function Layout({ children }) {
     navigate("/login");
   };
 
+  const toggleMenu = () => setIsMenuOpen(!isMenuOpen);
+
   return (
     <div className="app-layout">
-      <aside className="sidebar">
+      <button className="mobile-menu-btn" onClick={toggleMenu}>
+        {isMenuOpen ? "✕" : "☰"}
+      </button>
+
+      {isMenuOpen && (
+        <div className="sidebar-overlay" onClick={toggleMenu}></div>
+      )}
+
+      <aside className={`sidebar ${isMenuOpen ? "open" : ""}`}>
         <div className="sidebar-top">
           <h2 className="logo">Rental Manager</h2>
 
           <nav className="nav-links">
-            <Link to="/dashboard">Dashboard</Link>
-            <Link to="/profile">Profile</Link>
-            <Link to="/chats">Chats</Link>
+            <Link to="/dashboard" onClick={() => setIsMenuOpen(false)}>
+              Dashboard
+            </Link>
+            <Link to="/profile" onClick={() => setIsMenuOpen(false)}>
+              Profile
+            </Link>
+            <Link to="/chats" onClick={() => setIsMenuOpen(false)}>
+              Chats
+            </Link>
             {user?.role === "owner" && (
               <>
-                <Link to="/add-property">Add Property</Link>
-                <Link to="/my-properties">My Properties</Link>
-                <Link to="/booking-requests">Booking Requests</Link>
+                <Link to="/add-property" onClick={() => setIsMenuOpen(false)}>
+                  Add Property
+                </Link>
+                <Link to="/my-properties" onClick={() => setIsMenuOpen(false)}>
+                  My Properties
+                </Link>
+                <Link
+                  to="/booking-requests"
+                  onClick={() => setIsMenuOpen(false)}
+                >
+                  Booking Requests
+                </Link>
               </>
             )}
 
             {user?.role === "tenant" && (
               <>
-                <Link to="/properties">Browse Properties</Link>
-                <Link to="/my-bookings">My Bookings</Link>
+                <Link to="/properties" onClick={() => setIsMenuOpen(false)}>
+                  Browse Properties
+                </Link>
+                <Link to="/my-bookings" onClick={() => setIsMenuOpen(false)}>
+                  My Bookings
+                </Link>
               </>
             )}
           </nav>

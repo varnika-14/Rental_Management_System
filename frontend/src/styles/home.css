@@ -17,17 +17,20 @@
   align-items: center;
   padding: 1.5rem 5%;
   z-index: 100;
-  background: transparent;
+  background: #1e293b;
 }
 
 .nav-brand {
+  background-color: #1e293b;
+  display: block;
   font-size: 1.2rem;
   font-weight: 800;
-  color: #0f172a;
+  color: white;
   letter-spacing: 2px;
 }
 
 .nav-actions {
+  background-color: #1e293b;
   display: flex;
   gap: 1.5rem;
   align-items: center;
@@ -35,8 +38,8 @@
 
 .btn-text {
   background: none;
-  border: 3px solid whitesmoke;
-  color: #eaeef6;
+  border: 3px solid white;
+  color: white;
   font-weight: 1000;
   cursor: pointer;
 }
@@ -198,73 +201,73 @@
     overflow-y: auto;
     height: auto;
   }
-  
+
   .main-nav {
     padding: 1rem 4%;
     position: relative;
   }
-  
+
   .nav-brand {
     font-size: 1rem;
     letter-spacing: 1px;
   }
-  
+
   .nav-actions {
     gap: 1rem;
   }
-  
+
   .btn-primary-sm {
     padding: 8px 16px;
     font-size: 0.85rem;
   }
-  
+
   .btn-text {
     font-size: 0.85rem;
     border-width: 2px;
   }
-  
+
   .split-screen {
     flex-direction: column;
     height: auto;
   }
-  
+
   .split-panel {
     min-height: 70vh;
     width: 100%;
     padding: 2rem 1rem;
   }
-  
+
   .panel-content {
     max-width: 95%;
   }
-  
+
   .panel-title {
     font-size: 2rem;
     line-height: 1.2;
     margin-bottom: 1.2rem;
   }
-  
+
   .panel-subtitle {
     font-size: 0.75rem;
     letter-spacing: 2px;
     margin-bottom: 0.8rem;
   }
-  
+
   .panel-description {
     font-size: 1rem;
     line-height: 1.5;
     margin-bottom: 2rem;
   }
-  
+
   .panel-cta {
     padding: 12px 28px;
     font-size: 0.9rem;
   }
-  
+
   .minimal-footer {
     position: relative;
     padding: 1.5rem;
-    background: #f8fafc;
+    background: #ecf4fc;
   }
 }
 
@@ -274,42 +277,42 @@
     flex-direction: column;
     gap: 1rem;
   }
-  
+
   .nav-brand {
     font-size: 1.2rem;
   }
-  
+
   .nav-actions {
     width: 100%;
     justify-content: center;
   }
-  
+
   .split-panel {
     min-height: 60vh;
     padding: 1.5rem 0.75rem;
   }
-  
+
   .panel-content {
     max-width: 90%;
   }
-  
+
   .panel-title {
     font-size: 1.6rem;
     margin-bottom: 1rem;
   }
-  
+
   .panel-description {
     font-size: 0.95rem;
     margin-bottom: 1.5rem;
   }
-  
+
   .panel-cta {
     padding: 10px 24px;
     font-size: 0.85rem;
     width: 100%;
     max-width: 200px;
   }
-  
+
   .minimal-footer {
     font-size: 0.7rem;
     padding: 1rem;
