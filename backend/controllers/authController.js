@@ -245,22 +245,15 @@ exports.getDashboardStats = async (req, res) => {
     const userId = req.user.id;
     const userRole = req.user.role;
 
-    // Count unread messages - messages not sent by current user and not read by current user
     const conversations = await Conversation.find({
-      $or: [
-        { owner: userId },
-        { tenant: userId }
-      ]
-    }).select('_id');
-    
-    const conversationIds = conversations.map(conv => conv._id);
-    
+      $or: [{ owner: userId }, { tenant: userId }],
+    }).select("_id");
+
+    const conversationIds = conversations.map((conv) => conv._id);
+
     const unreadCount = await Message.countDocuments({
       conversation: { $in: conversationIds },
-      $and: [
-        { sender: { $ne: userId } }, // Not sent by current user
-        { readBy: { $ne: userId } } // Not read by current user
-      ]
+      $and: [{ sender: { $ne: userId } }, { readBy: { $ne: userId } }],
     });
 
     let stats = {
@@ -268,13 +261,11 @@ exports.getDashboardStats = async (req, res) => {
     };
 
     if (userRole === "owner") {
-      // Owner stats
       const totalListings = await Property.countDocuments({ owner: userId });
-      
-      // Booking requests for owner's properties
+
       const bookingRequests = await Booking.countDocuments({
         owner: userId,
-        status: "pending"
+        status: "pending",
       });
 
       stats = {
@@ -285,17 +276,15 @@ exports.getDashboardStats = async (req, res) => {
         status: "Verified",
       };
     } else {
-      // Tenant stats
       const totalBookings = await Booking.countDocuments({ tenant: userId });
-      
-      // Count bookings by status
+
       const acceptedBookings = await Booking.countDocuments({
         tenant: userId,
-        status: "accepted"
+        status: "accepted",
       });
       const pendingBookings = await Booking.countDocuments({
         tenant: userId,
-        status: "pending"
+        status: "pending",
       });
 
       stats = {
