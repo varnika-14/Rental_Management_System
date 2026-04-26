@@ -149,7 +149,6 @@ exports.sendMessage = async (req, res) => {
     const io = req.app.get("io");
     if (io) {
       const roomName = `conversation:${conversation._id}`;
-      console.log(`Emitting new_message to room: ${roomName}`);
 
       io.to(roomName).emit("new_message", {
         conversationId: conversation._id.toString(),
@@ -159,8 +158,6 @@ exports.sendMessage = async (req, res) => {
       io.to(roomName).emit("conversation_updated", {
         conversationId: conversation._id.toString(),
       });
-    } else {
-      console.log("Socket.IO instance not found");
     }
 
     return res.status(201).json(populatedMessage);

@@ -4,7 +4,6 @@ import {
   getConversationMessages,
   getConversations,
   sendConversationMessage,
-  startConversation,
 } from "../services/chatApi";
 import { connectSocket, getSocket } from "../services/socket";
 import "../styles/chat.css";
@@ -96,7 +95,9 @@ function Chats() {
     socketRef.current = socket;
 
     const handleNewMessage = ({ conversationId, message }) => {
-      console.log("New message received:", conversationId, message);
+      console.log("New message received:", conversationId);
+
+      loadConversations();
 
       if (selectedConversationIdRef.current === conversationId) {
         setMessages((prev) => {
@@ -105,7 +106,6 @@ function Chats() {
         });
         scrollToBottom();
       }
-      loadConversations();
     };
 
     const handleConversationUpdated = ({ conversationId }) => {
@@ -134,6 +134,14 @@ function Chats() {
   useEffect(() => {
     if (selectedConversation?._id) {
       selectedConversationIdRef.current = selectedConversation._id;
+
+      setConversations((prev) =>
+        prev.map((conv) =>
+          conv._id === selectedConversation._id
+            ? { ...conv, unreadCount: 0 }
+            : conv,
+        ),
+      );
 
       const socket = getSocket();
       if (socket && socket.connected) {
@@ -170,12 +178,14 @@ function Chats() {
         selectedConversation._id,
         messageText.trim(),
       );
+
       setMessages((prev) => {
         if (prev.some((item) => item._id === res.data._id)) return prev;
         return [...prev, res.data];
       });
       setMessageText("");
       scrollToBottom();
+
       await loadConversations();
     } catch (error) {
       console.error("Error sending message:", error);
@@ -197,7 +207,9 @@ function Chats() {
     <div className="chat-page">
       <h2 className="chat-heading">Chats</h2>
       <div
-        className={`chat-layout ${selectedConversation ? "chat-open" : "chat-closed"}`}
+        className={`chat-layout ${
+          selectedConversation ? "chat-open" : "chat-closed"
+        }`}
       >
         <aside className="chat-sidebar">
           <div className="chat-sidebar-header">All Conversations</div>

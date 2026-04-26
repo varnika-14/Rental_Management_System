@@ -12,31 +12,33 @@ export const connectSocket = () => {
     return null;
   }
 
-  if (socketInstance) {
-    console.log("Socket already connected, returning existing");
-    return socketInstance;
+  if (socketInstance && !socketInstance.connected) {
+    socketInstance.disconnect();
+    socketInstance = null;
   }
 
-  socketInstance = io(SOCKET_URL, {
-    transports: ["websocket"],
-    auth: { token },
-    reconnection: true,
-    reconnectionAttempts: Infinity,
-    reconnectionDelay: 1000,
-    reconnectionDelayMax: 5000,
-  });
+  if (!socketInstance) {
+    socketInstance = io(SOCKET_URL, {
+      transports: ["websocket"],
+      auth: { token },
+      reconnection: true,
+      reconnectionAttempts: 10,
+      reconnectionDelay: 1000,
+      reconnectionDelayMax: 5000,
+    });
 
-  socketInstance.on("connect", () => {
-    console.log("Socket connected successfully:", socketInstance.id);
-  });
+    socketInstance.on("connect", () => {
+      console.log("Socket connected:", socketInstance.id);
+    });
 
-  socketInstance.on("disconnect", (reason) => {
-    console.log("Socket disconnected:", reason);
-  });
+    socketInstance.on("disconnect", (reason) => {
+      console.log("Socket disconnected:", reason);
+    });
 
-  socketInstance.on("connect_error", (error) => {
-    console.error("Socket connection error:", error.message);
-  });
+    socketInstance.on("connect_error", (error) => {
+      console.error("Socket connection error:", error.message);
+    });
+  }
 
   return socketInstance;
 };
