@@ -122,7 +122,6 @@ function Chats() {
   }, [queryConversationId]);
 
   useEffect(() => {
-    // Refresh chats when route becomes active from sidebar/dashboard navigation
     if (location.pathname === "/chats") {
       loadConversations();
       if (selectedConversationIdRef.current) {

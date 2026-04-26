@@ -15,7 +15,7 @@ const io = new Server(server, {
     origin: [
       "http://localhost:3000",
       "https://rental-management-system-var.vercel.app",
-    ], // ✅ Allows both
+    ],
     methods: ["GET", "POST"],
   },
 });
