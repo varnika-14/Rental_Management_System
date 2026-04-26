@@ -4,8 +4,9 @@ import {
   getConversationMessages,
   getConversations,
   sendConversationMessage,
+  startConversation,
 } from "../services/chatApi";
-import { connectSocket } from "../services/socket";
+import { connectSocket, getSocket } from "../services/socket";
 import "../styles/chat.css";
 
 function Chats() {
@@ -47,6 +48,7 @@ function Chats() {
   useEffect(() => {
     scrollToBottom();
   }, [messages]);
+
   const loadConversations = async () => {
     try {
       const res = await getConversations();
@@ -90,84 +92,66 @@ function Chats() {
   };
 
   useEffect(() => {
-    setLoading(true);
-    loadConversations();
     const socket = connectSocket();
     socketRef.current = socket;
 
     const handleNewMessage = ({ conversationId, message }) => {
-      if (selectedConversationIdRef.current !== conversationId) {
-        loadConversations();
-        return;
+      console.log("New message received:", conversationId, message);
+
+      if (selectedConversationIdRef.current === conversationId) {
+        setMessages((prev) => {
+          if (prev.some((item) => item._id === message._id)) return prev;
+          return [...prev, message];
+        });
+        scrollToBottom();
       }
-
-      setMessages((prev) => {
-        if (prev.some((item) => item._id === message._id)) return prev;
-        return [...prev, message];
-      });
       loadConversations();
     };
 
-    const handleConversationUpdated = () => {
+    const handleConversationUpdated = ({ conversationId }) => {
+      console.log("Conversation updated:", conversationId);
       loadConversations();
     };
 
-    socket.on("new_message", handleNewMessage);
-    socket.on("conversation_updated", handleConversationUpdated);
-
-    return () => {
-      socket.off("new_message", handleNewMessage);
-      socket.off("conversation_updated", handleConversationUpdated);
-    };
-  }, [queryConversationId]);
-
-  useEffect(() => {
-    if (location.pathname === "/chats") {
-      loadConversations();
-      if (selectedConversationIdRef.current) {
-        loadMessages(selectedConversationIdRef.current);
-      }
+    if (socket) {
+      socket.on("new_message", handleNewMessage);
+      socket.on("conversation_updated", handleConversationUpdated);
     }
-  }, [location.key, location.pathname]);
 
-  useEffect(() => {
-    const refreshOnFocus = () => {
-      if (document.visibilityState === "visible") {
-        loadConversations();
-        if (selectedConversationIdRef.current) {
-          loadMessages(selectedConversationIdRef.current);
-        }
+    return () => {
+      if (socket) {
+        socket.off("new_message", handleNewMessage);
+        socket.off("conversation_updated", handleConversationUpdated);
       }
     };
+  }, []);
 
-    window.addEventListener("focus", refreshOnFocus);
-    document.addEventListener("visibilitychange", refreshOnFocus);
-    return () => {
-      window.removeEventListener("focus", refreshOnFocus);
-      document.removeEventListener("visibilitychange", refreshOnFocus);
-    };
+  useEffect(() => {
+    setLoading(true);
+    loadConversations();
   }, []);
 
   useEffect(() => {
     if (selectedConversation?._id) {
       selectedConversationIdRef.current = selectedConversation._id;
-      setConversations((prev) =>
-        prev.map((conversation) =>
-          conversation._id === selectedConversation._id
-            ? { ...conversation, unreadCount: 0 }
-            : conversation,
-        ),
-      );
-      loadMessages(selectedConversation._id);
-      loadConversations();
-      socketRef.current?.emit("join_conversation", {
-        conversationId: selectedConversation._id,
-      });
 
-      return () => {
-        socketRef.current?.emit("leave_conversation", {
+      const socket = getSocket();
+      if (socket && socket.connected) {
+        socket.emit("join_conversation", {
           conversationId: selectedConversation._id,
         });
+      }
+
+      loadMessages(selectedConversation._id);
+      loadConversations();
+
+      return () => {
+        const socket = getSocket();
+        if (socket && socket.connected) {
+          socket.emit("leave_conversation", {
+            conversationId: selectedConversation._id,
+          });
+        }
       };
     }
     selectedConversationIdRef.current = null;
@@ -175,9 +159,7 @@ function Chats() {
 
   const otherParticipant = useMemo(() => {
     if (!selectedConversation || !user?._id) return null;
-    return selectedConversation.owner?._id === user._id
-      ? selectedConversation.tenant
-      : selectedConversation.owner;
+    return selectedConversation.otherUser || selectedConversation;
   }, [selectedConversation, user?._id]);
 
   const handleSend = async () => {
@@ -193,6 +175,7 @@ function Chats() {
         return [...prev, res.data];
       });
       setMessageText("");
+      scrollToBottom();
       await loadConversations();
     } catch (error) {
       console.error("Error sending message:", error);
@@ -224,10 +207,7 @@ function Chats() {
             </p>
           ) : (
             conversations.map((conversation) => {
-              const other =
-                conversation.owner?._id === user?._id
-                  ? conversation.tenant
-                  : conversation.owner;
+              const other = conversation.otherUser;
               return (
                 <button
                   key={conversation._id}
@@ -239,13 +219,6 @@ function Chats() {
                   }`}
                   onClick={() => {
                     setSelectedConversation(conversation);
-                    setConversations((prev) =>
-                      prev.map((item) =>
-                        item._id === conversation._id
-                          ? { ...item, unreadCount: 0 }
-                          : item,
-                      ),
-                    );
                   }}
                 >
                   <div className="chat-list-top">
@@ -255,9 +228,6 @@ function Chats() {
                     <div className="chat-list-main">
                       <div className="chat-list-title">
                         {other?.name || "Unknown User"}
-                      </div>
-                      <div className="chat-list-subtitle">
-                        {conversation.property?.title || "Property"}
                       </div>
                     </div>
                     <div className="chat-list-time">
@@ -289,7 +259,6 @@ function Chats() {
                 </div>
                 <div>
                   <h3>{otherParticipant?.name || "Chat"}</h3>
-                  <p>{selectedConversation.property?.title}</p>
                 </div>
               </div>
             </div>

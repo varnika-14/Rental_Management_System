@@ -1,6 +1,5 @@
 const Conversation = require("../models/Conversation");
 const Message = require("../models/Message");
-const Property = require("../models/Property");
 
 const getUserId = (req) => (req.user._id || req.user.id).toString();
 
@@ -10,39 +9,33 @@ const isParticipant = (conversation, userId) =>
 
 exports.startConversation = async (req, res) => {
   try {
-    const { propertyId, ownerId, tenantId } = req.body;
+    const { ownerId, tenantId } = req.body;
     const requesterId = getUserId(req);
 
-    if (!propertyId || !ownerId || !tenantId) {
-      return res.status(400).json({ message: "Missing required fields" });
+    if (!ownerId || !tenantId) {
+      return res.status(400).json({ message: "Missing ownerId or tenantId" });
     }
 
-    if (requesterId !== ownerId.toString() && requesterId !== tenantId.toString()) {
+    if (
+      requesterId !== ownerId.toString() &&
+      requesterId !== tenantId.toString()
+    ) {
       return res.status(403).json({ message: "Not allowed" });
     }
 
-    const property = await Property.findById(propertyId).select("owner");
-    if (!property) return res.status(404).json({ message: "Property not found" });
-    if (property.owner.toString() !== ownerId.toString()) {
-      return res.status(400).json({ message: "Owner does not match property" });
-    }
-
     let conversation = await Conversation.findOne({
-      property: propertyId,
       owner: ownerId,
       tenant: tenantId,
     });
 
     if (!conversation) {
       conversation = await Conversation.create({
-        property: propertyId,
         owner: ownerId,
         tenant: tenantId,
       });
     }
 
     const populated = await Conversation.findById(conversation._id)
-      .populate("property", "title location")
       .populate("owner", "name email profilePhoto role")
       .populate("tenant", "name email profilePhoto role");
 
@@ -58,7 +51,6 @@ exports.getConversations = async (req, res) => {
     const conversations = await Conversation.find({
       $or: [{ owner: userId }, { tenant: userId }],
     })
-      .populate("property", "title location")
       .populate("owner", "name email profilePhoto role")
       .populate("tenant", "name email profilePhoto role")
       .sort({ lastMessageAt: -1, updatedAt: -1 });
@@ -71,8 +63,14 @@ exports.getConversations = async (req, res) => {
           readBy: { $ne: userId },
         });
 
+        const otherUser =
+          conversation.owner._id.toString() === userId
+            ? conversation.tenant
+            : conversation.owner;
+
         return {
           ...conversation.toObject(),
+          otherUser,
           unreadCount,
         };
       }),
@@ -150,17 +148,24 @@ exports.sendMessage = async (req, res) => {
 
     const io = req.app.get("io");
     if (io) {
-      io.to(`conversation:${conversation._id}`).emit("new_message", {
+      const roomName = `conversation:${conversation._id}`;
+      console.log(`Emitting new_message to room: ${roomName}`);
+
+      io.to(roomName).emit("new_message", {
         conversationId: conversation._id.toString(),
         message: populatedMessage,
       });
-      io.to(`conversation:${conversation._id}`).emit("conversation_updated", {
+
+      io.to(roomName).emit("conversation_updated", {
         conversationId: conversation._id.toString(),
       });
+    } else {
+      console.log("Socket.IO instance not found");
     }
 
     return res.status(201).json(populatedMessage);
   } catch (error) {
+    console.error("Send message error:", error);
     return res.status(500).json({ message: error.message });
   }
 };

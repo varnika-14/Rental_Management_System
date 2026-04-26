@@ -2,11 +2,6 @@ const mongoose = require("mongoose");
 
 const ConversationSchema = new mongoose.Schema(
   {
-    property: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Property",
-      required: true,
-    },
     owner: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
@@ -29,9 +24,6 @@ const ConversationSchema = new mongoose.Schema(
   { timestamps: true },
 );
 
-ConversationSchema.index(
-  { property: 1, owner: 1, tenant: 1 },
-  { unique: true },
-);
+ConversationSchema.index({ owner: 1, tenant: 1 }, { unique: true });
 
 module.exports = mongoose.model("Conversation", ConversationSchema);
