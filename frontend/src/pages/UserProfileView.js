@@ -32,7 +32,10 @@ function UserProfileView() {
   return (
     <div className="profile-container">
       {showModal && (
-        <div className="image-modal-overlay" onClick={() => setShowModal(false)}>
+        <div
+          className="image-modal-overlay"
+          onClick={() => setShowModal(false)}
+        >
           <div className="modal-content">
             <span className="close-modal">&times;</span>
             <img
@@ -88,39 +91,15 @@ function UserProfileView() {
             <input value={user?.qualification || "Not provided"} readOnly />
           </div>
           <div className="info-group">
-            <label>Govt ID Number</label>
-            <input value={user?.govtIdNumber || "Not provided"} readOnly />
-          </div>
-          <div className="info-group">
-            <label>UPI ID</label>
-            <input value={user?.upiId || "Not provided"} readOnly />
-          </div>
-          <div className="info-group">
             <label>Emergency Contact No</label>
             <input value={user?.emergencyContact || "Not provided"} readOnly />
           </div>
           <div className="info-group full-width">
-            <label>Bank Account Details</label>
-            <textarea value={user?.bankDetails || "Not provided"} readOnly />
-          </div>
-          <div className="info-group full-width">
             <label>Permanent Address</label>
-            <textarea value={user?.permanentAddress || "Not provided"} readOnly />
-          </div>
-          <div className="info-group full-width">
-            <label>Verified Government ID Document</label>
-            <div className="id-photo-preview" onClick={() => setShowModal(true)}>
-              {user?.govtIdPhoto ? (
-                <img
-                  src={user.govtIdPhoto}
-                  alt="Govt ID Preview"
-                  className="id-img"
-                />
-              ) : (
-                <p className="no-photo-text">No image uploaded</p>
-              )}
-            </div>
-            <p className="help-text">Click image above to view bigger</p>
+            <textarea
+              value={user?.permanentAddress || "Not provided"}
+              readOnly
+            />
           </div>
         </div>
       </div>
