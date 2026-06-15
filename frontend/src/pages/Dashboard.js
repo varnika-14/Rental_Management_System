@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import "../styles/dashboard.css";
 import API from "../services/api";
+
 function Dashboard() {
   const [user, setUser] = useState(null);
   const [stats, setStats] = useState({
@@ -134,7 +135,7 @@ function Dashboard() {
 
       <div className="dashboard-grid">
         <div className="feature-section">
-          <h2 className="group-title">Property Management</h2>
+          <h2 className="group-title">Property and Rent Management</h2>
           <div className="button-grid">
             {user.role === "owner" ? (
               <>
@@ -152,15 +153,31 @@ function Dashboard() {
                     <small>Manage your listings</small>
                   </div>
                 </Link>
+                <Link to="/rent-tracking" className="feature-btn">
+                  <span className="btn-icon">💰</span>
+                  <div className="btn-label">
+                    <strong>Rent Tracking</strong>
+                    <small>Monitor payments & revenue</small>
+                  </div>
+                </Link>
               </>
             ) : (
-              <Link to="/properties" className="feature-btn">
-                <span className="btn-icon">🔍</span>
-                <div className="btn-label">
-                  <strong>Browse Properties</strong>
-                  <small>Find your next home</small>
-                </div>
-              </Link>
+              <>
+                <Link to="/properties" className="feature-btn">
+                  <span className="btn-icon">🔍</span>
+                  <div className="btn-label">
+                    <strong>Browse Properties</strong>
+                    <small>Find your next home</small>
+                  </div>
+                </Link>
+                <Link to="/rent-tracking" className="feature-btn">
+                  <span className="btn-icon">💰</span>
+                  <div className="btn-label">
+                    <strong>Rent Tracking</strong>
+                    <small>Track your payments</small>
+                  </div>
+                </Link>
+              </>
             )}
             <Link to="/my-bookings" className="feature-btn">
               <span className="btn-icon">📅</span>

@@ -54,6 +54,7 @@ app.use("/api/property", require("./routes/property"));
 app.use("/api/booking", require("./routes/booking"));
 app.use("/api/chat", require("./routes/chat"));
 app.use("/api/payment", require("./routes/payment"));
+app.use("/api/ai", require("./routes/aiRoutes"));
 const PORT = process.env.PORT || 5000;
 
 io.use((socket, next) => {
