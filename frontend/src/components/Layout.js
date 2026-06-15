@@ -52,6 +52,9 @@ function Layout({ children }) {
                 >
                   Booking Requests
                 </Link>
+                <Link to="/rent-tracking" onClick={() => setIsMenuOpen(false)}>
+                  Rent Tracking
+                </Link>
               </>
             )}
 
@@ -62,6 +65,9 @@ function Layout({ children }) {
                 </Link>
                 <Link to="/my-bookings" onClick={() => setIsMenuOpen(false)}>
                   My Bookings
+                </Link>
+                <Link to="/rent-tracking" onClick={() => setIsMenuOpen(false)}>
+                  Rent Tracking
                 </Link>
               </>
             )}

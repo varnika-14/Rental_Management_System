@@ -14,6 +14,8 @@ import Layout from "./components/Layout";
 import Profile from "./pages/Profile";
 import UserProfileView from "./pages/UserProfileView";
 import Chats from "./pages/Chats";
+import RentTracking from "./pages/RentTracking";
+import PaymentStatus from "./pages/PaymentStatus";
 function App() {
   return (
     <BrowserRouter>
@@ -131,6 +133,17 @@ function App() {
             </PrivateRoute>
           }
         />
+        <Route
+          path="/rent-tracking"
+          element={
+            <PrivateRoute>
+              <Layout>
+                <RentTracking />
+              </Layout>
+            </PrivateRoute>
+          }
+        />
+        <Route path="/payment-status" element={<PaymentStatus />} />
         <Route path="*" element={<Navigate to="/" replace />} />
       </Routes>
     </BrowserRouter>

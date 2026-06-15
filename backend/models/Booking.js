@@ -43,8 +43,25 @@ const BookingSchema = new mongoose.Schema(
       type: Number,
       required: true,
     },
+    totalRent: {
+      type: Number,
+    },
+    paymentType: {
+      type: String,
+      enum: ["one_time", "monthly"],
+      default: "one_time",
+    },
     rejectionReason: String,
     cancellationReason: String,
+    paymentStatus: {
+      type: String,
+      enum: ["pending", "paid", "partial", "failed"],
+      default: "pending",
+    },
+    paidAmount: {
+      type: Number,
+      default: 0,
+    },
   },
   { timestamps: true },
 );

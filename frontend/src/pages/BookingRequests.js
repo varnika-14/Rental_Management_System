@@ -1,8 +1,14 @@
 import React, { useState, useEffect } from "react";
 import API from "../services/api";
 import "../styles/booking.css";
+import "../styles/payment.css";
 import { useNavigate } from "react-router-dom";
 import { startConversation } from "../services/chatApi";
+import {
+  getPaymentStatusLabel,
+  getRemainingRent,
+  getTotalRent,
+} from "../utils/rentUtils";
 
 function BookingRequests() {
   const navigate = useNavigate();
@@ -55,8 +61,9 @@ function BookingRequests() {
     }
   };
 
-  if (loading)
+  if (loading) {
     return <div className="loading-container">Fetching Requests...</div>;
+  }
 
   return (
     <div className="booking-page-container">
@@ -74,78 +81,115 @@ function BookingRequests() {
         </div>
       ) : (
         <div className="booking-grid">
-          {requests.map((r) => (
-            <div key={r._id} className="request-card">
-              <div className="request-header">
-                <span className={`status-badge ${r.status}`}>{r.status}</span>
-                <h3 className="property-name">
-                  {r.property?.title || "Unknown Property"}
-                </h3>
-                <p className="property-address">📍 {r.property?.location}</p>
-              </div>
+          {requests.map((r) => {
+            const totalRent = getTotalRent(r);
+            const remaining = getRemainingRent({ ...r, totalRent });
 
-              <div className="request-content">
-                <div className="tenant-info">
-                  <div className="avatar-placeholder">
-                    {r.tenant?.name?.charAt(0)}
-                  </div>
-                  <div className="tenant-meta">
-                    <strong>{r.tenant?.name}</strong>
-                    <div className="tenant-actions">
-                      <button
-                        onClick={() => navigate(`/users/${r.tenant._id}`)}
-                      >
-                        Profile
-                      </button>
-                      <button onClick={() => handleChatWithTenant(r)}>
-                        Message
-                      </button>
+            return (
+              <div key={r._id} className="request-card">
+                <div className="request-header">
+                  <span className={`status-badge ${r.status}`}>{r.status}</span>
+                  <h3 className="property-name">
+                    {r.property?.title || "Unknown Property"}
+                  </h3>
+                  <p className="property-address">{r.property?.location}</p>
+                </div>
+
+                <div className="request-content">
+                  <div className="tenant-info">
+                    <div className="avatar-placeholder">
+                      {r.tenant?.name?.charAt(0)}
+                    </div>
+                    <div className="tenant-meta">
+                      <strong>{r.tenant?.name}</strong>
+                      <div className="tenant-actions">
+                        <button
+                          onClick={() => navigate(`/users/${r.tenant._id}`)}
+                        >
+                          Profile
+                        </button>
+                        <button onClick={() => handleChatWithTenant(r)}>
+                          Message
+                        </button>
+                      </div>
                     </div>
                   </div>
+
+                  <hr className="divider" />
+
+                  <div className="details-list">
+                    <div className="detail-item">
+                      <span className="label">Move-in Date</span>
+                      <span className="value">
+                        {new Date(r.startDate).toLocaleDateString("en-GB")}
+                      </span>
+                    </div>
+                    <div className="detail-item">
+                      <span className="label">Stay Duration</span>
+                      <span className="value">
+                        {r.duration} {r.durationType}
+                      </span>
+                    </div>
+                    <div className="detail-item">
+                      <span className="label">Total Rent</span>
+                      <span className="value accent">
+                        ₹{totalRent.toLocaleString()}
+                      </span>
+                    </div>
+                  </div>
+
+                  {r.status === "accepted" && (
+                    <div className="payment-status-box">
+                      <div className="payment-status-info">
+                        <span className="payment-status-label">
+                          Payment Status
+                        </span>
+                        <span
+                          className={`payment-status-value ${r.paymentStatus}`}
+                        >
+                          {getPaymentStatusLabel(r.paymentStatus)}
+                        </span>
+                        <small>
+                          Received: ₹{(r.paidAmount || 0).toLocaleString()} |
+                          Pending: ₹{remaining.toLocaleString()}
+                        </small>
+                        {r.paymentType && (
+                          <small>
+                            Plan:{" "}
+                            {r.paymentType === "monthly" ? "Monthly" : "One-Time"}
+                          </small>
+                        )}
+                      </div>
+                      <button
+                        className="pay-btn"
+                        style={{ background: "#3b82f6" }}
+                        onClick={() => navigate("/rent-tracking")}
+                      >
+                        View Tracking
+                      </button>
+                    </div>
+                  )}
                 </div>
 
-                <hr className="divider" />
-
-                <div className="details-list">
-                  <div className="detail-item">
-                    <span className="label">Move-in Date</span>
-                    <span className="value">
-                      {new Date(r.startDate).toLocaleDateString("en-GB")}
-                    </span>
+                {r.status === "pending" && (
+                  <div className="request-footer">
+                    <button
+                      className="btn-secondary reject"
+                      onClick={() => handleAction(r._id, "reject")}
+                    >
+                      Reject
+                    </button>
+                    <button
+                      className="btn-primary accept"
+                      onClick={() => handleAction(r._id, "accept")}
+                    >
+                      Accept Request
+                    </button>
                   </div>
-                  <div className="detail-item">
-                    <span className="label">Stay Duration</span>
-                    <span className="value">
-                      {r.duration} {r.durationType}
-                    </span>
-                  </div>
-                  <div className="detail-item">
-                    <span className="label">Monthly Rent</span>
-                    <span className="value accent">
-                      ₹{r.monthlyRent.toLocaleString()}
-                    </span>
-                  </div>
-                </div>
+                )}
               </div>
-
-              {r.status === "pending" && (
-                <div className="request-footer">
-                  <button
-                    className="btn-secondary reject"
-                    onClick={() => handleAction(r._id, "reject")}
-                  >
-                    Reject
-                  </button>
-                  <button
-                    className="btn-primary accept"
-                    onClick={() => handleAction(r._id, "accept")}
-                  >
-                    Accept Request
-                  </button>
-                </div>
-              )}
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>

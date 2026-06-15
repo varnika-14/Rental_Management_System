@@ -293,6 +293,22 @@
   }
 }
 
+.success-box {
+  padding: 12px;
+  background: #dcfce7;
+  border-radius: 8px;
+  color: #15803d;
+  font-size: 14px;
+}
+
+.rejection-box {
+  padding: 12px;
+  background: #fee2e2;
+  border-radius: 8px;
+  color: #b91c1c;
+  font-size: 14px;
+}
+
 .loading-container {
   display: flex;
   justify-content: center;

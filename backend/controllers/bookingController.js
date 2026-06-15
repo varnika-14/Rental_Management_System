@@ -1,5 +1,7 @@
 const Booking = require("../models/Booking");
 const Property = require("../models/Property");
+const Payment = require("../models/Payment");
+const { getTotalRent } = require("../utils/rentUtils");
 
 exports.createBookingRequest = async (req, res) => {
   try {
@@ -212,7 +214,7 @@ exports.getOwnerBookingRequests = async (req, res) => {
     const ownerId = req.user._id || req.user.id;
     const bookings = await Booking.find({ owner: ownerId })
       .populate("property")
-      .populate("tenant", "name email phoneNumber")
+      .populate("tenant", "name email phonenumber")
       .sort({ createdAt: -1 });
     res.json(bookings);
   } catch (error) {
@@ -225,9 +227,60 @@ exports.getTenantBookings = async (req, res) => {
     const tenantId = req.user._id || req.user.id;
     const bookings = await Booking.find({ tenant: tenantId })
       .populate("property")
-      .populate("owner", "name email phoneNumber")
+      .populate("owner", "name email phonenumber")
       .sort({ createdAt: -1 });
     res.json(bookings);
+  } catch (error) {
+    res.status(500).json({ message: error.message });
+  }
+};
+
+exports.getRentTracking = async (req, res) => {
+  try {
+    const userId = req.user._id || req.user.id;
+    const role = req.user.role;
+    const filter =
+      role === "owner"
+        ? { owner: userId, status: "accepted" }
+        : { tenant: userId, status: "accepted" };
+
+    const bookings = await Booking.find(filter)
+      .populate("property")
+      .populate(role === "owner" ? "tenant" : "owner", "name email phonenumber")
+      .sort({ createdAt: -1 });
+
+    const bookingIds = bookings.map((b) => b._id);
+    const payments = await Payment.find({
+      bookingId: { $in: bookingIds },
+      status: "success",
+    }).sort({ createdAt: -1 });
+
+    const paymentsByBooking = {};
+    payments.forEach((p) => {
+      const key = p.bookingId.toString();
+      if (!paymentsByBooking[key]) paymentsByBooking[key] = [];
+      paymentsByBooking[key].push(p);
+    });
+
+    const data = bookings.map((b) => {
+      const totalRent = getTotalRent(b);
+      const paidAmount = b.paidAmount || 0;
+      return {
+        ...b.toObject(),
+        totalRent,
+        remaining: Math.max(0, totalRent - paidAmount),
+        payments: paymentsByBooking[b._id.toString()] || [],
+      };
+    });
+
+    const summary = {
+      totalRevenue: data.reduce((sum, b) => sum + (b.paidAmount || 0), 0),
+      pendingAmount: data.reduce((sum, b) => sum + b.remaining, 0),
+      fullyPaidCount: data.filter((b) => b.paymentStatus === "paid").length,
+      activeRentals: data.length,
+    };
+
+    res.json({ bookings: data, summary });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }
