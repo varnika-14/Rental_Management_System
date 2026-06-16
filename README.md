@@ -160,17 +160,17 @@ This platform bridges the gap between property owners and tenants by providing a
 
 **Frontend:** [https://rental-management-system-var.vercel.app](https://rental-management-system-var.vercel.app)
 
-**Backend API:** [https://rental-management-system-4.onrender.com](https://rental-management-system-4.onrender.com)
+**Backend API:** [https://rental-backend-sh0x.onrender.com](https://rental-backend-sh0x.onrender.com)
 
 ### Test Credentials
 
 **Owner Account:**
-- Email: owner@example.com
-- Password: owner123
+- Email: varnikapathuri@gmail.com
+- Password: var
 
 **Tenant Account:**
-- Email: tenant@example.com
-- Password: tenant123
+- Email: varnikapathuri1410@gmail.com
+- Password: varnika
 
 ---
 
