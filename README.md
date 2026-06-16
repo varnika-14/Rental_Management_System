@@ -183,16 +183,6 @@ This platform bridges the gap between property owners and tenants by providing a
 
 **Backend API:** [https://rental-backend-sh0x.onrender.com](https://rental-backend-sh0x.onrender.com)
 
-### Test Credentials
-
-**Owner Account:**
-- Email: varnikapathuri@gmail.com
-- Password: var
-
-**Tenant Account:**
-- Email: varnikapathuri1410@gmail.com
-- Password: varnika
-
 ---
 
 ## 💡 Key Highlights
