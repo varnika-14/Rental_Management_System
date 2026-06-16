@@ -145,14 +145,35 @@ This platform bridges the gap between property owners and tenants by providing a
 
 ## 📸 Screenshots
 
-| Feature | Description |
-|---------|-------------|
-| Home Screen | Role selection (Owner/Tenant) landing page |
-| Dashboard | Role-specific analytics and quick actions |
-| Property Listing | Grid view with filters and AI search |
-| Booking Requests | Owner view with accept/reject options |
-| Rent Tracking | Payment progress and history |
-| Chat Interface | Real-time messaging system |
+### Home Page
+![Home Page](./screenshots/home.png)
+
+### Owner Dashboard
+![Owner Dashboard](./screenshots/owner-dashboard.png)
+
+### Tenant Dashboard
+![Tenant Dashboard](./screenshots/tenant-dashboard.png)
+
+### Add Property with AI Price Prediction
+![Add Property](./screenshots/add-property.png)
+
+### Natural Language Search
+![AI Search](./screenshots/nl-search.png)
+
+### Property Listing
+![Properties](./screenshots/properties.png)
+
+### Booking Management
+![Booking Requests](./screenshots/booking-requests.png)
+
+### Rent Tracking Dashboard
+![Rent Tracking](./screenshots/rent-tracking.png)
+
+### Real-Time Chat
+![Chat Interface](./screenshots/chat.png)
+
+### Payment Processing
+![Payment Modal](./screenshots/payment.png)
 
 ---
 
